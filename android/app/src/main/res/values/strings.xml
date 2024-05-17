@@ -1,0 +1,10 @@
+<!--<resources>
+    <string name="facebook_app_id">1091868494701106</string>
+    <string name="facebook_client_token">afe591fe235bc9e2be9975ace3dacceb</string>
+</resources>-->
+
+<resources>
+    <string name="app_name">LesGo</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
+</resources>

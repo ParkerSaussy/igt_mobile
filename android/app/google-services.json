@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "512852361924",
+    "project_id": "itsgotime-2be1f",
+    "storage_bucket": "itsgotime-2be1f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512852361924:android:e2984fee293871b7377f91",
+        "android_client_info": {
+          "package_name": "com.itsgotime.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "512852361924-hq633k7f25svn1mnu0i4rncq15gh36c9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlEOchMQVLcVF6olcRXt7xMFiir6CeJIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "512852361924-hq633k7f25svn1mnu0i4rncq15gh36c9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
