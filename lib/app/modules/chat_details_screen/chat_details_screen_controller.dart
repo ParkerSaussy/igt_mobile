@@ -64,6 +64,12 @@ class ChatDetailsScreenController extends GetxController {
     }
   }
 
+  /// Gets the details of the group chat.
+  ///
+  /// This method fetches the details of the group chat from Firestore and
+  /// stores it in the [conversationListModel] variable. It also fetches the
+  /// FCM tokens of the group members and stores them in the [lstFcmToken]
+  /// variable.
   void getGroupDetails() {
     RequestManager.showEasyLoader();
     FirebaseFirestore.instance
