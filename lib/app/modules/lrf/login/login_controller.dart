@@ -58,6 +58,14 @@ class LoginController extends GetxController {
     //Get.offAllNamed(Routes.DASHBOARD);
   }
 
+  /// Initiates the login process by sending a request with user credentials
+  /// and device information to the server. Based on the login response, it
+  /// handles user existence in Firebase, updates FCM token, and navigates
+  /// to the appropriate screen. If the user is logging in via social 
+  /// accounts, it handles the necessary parameters accordingly. It also 
+  /// verifies whether the user's email and mobile number are verified, 
+  /// directing them to the OTP screen if needed.
+
   void doLogin() async {
     final deviceId = await getDeviceId();
     printMessage("Device Id " + deviceId.toString());
@@ -200,7 +208,9 @@ class LoginController extends GetxController {
 
   GoogleSignInClass googleSignInClass = GoogleSignInClass();
 
-  doGoogleLogin() async {
+  /// It will do google signin and then it will do login if internet is connected
+  /// otherwise it will show a toast message
+  void doGoogleLogin() async {
     if (!await isConnectedNetwork()) {
       RequestManager.getSnackToast(
         // title: LabelKeys.noInternet.tr,
@@ -231,7 +241,11 @@ class LoginController extends GetxController {
     }
   }
 
-  doAppleLogin() async {
+  /// Do Apple Sign in and then it will do login if internet is connected.
+  /// If email is not available in apple sign in then it will call
+  /// [getEmailForAppleLogin] to get the email from our server.
+  /// If internet is not connected then it will show a toast message
+  void doAppleLogin() async {
     if (!await isConnectedNetwork()) {
       RequestManager.getSnackToast(
         message: LabelKeys.checkInternet.tr,
@@ -262,6 +276,10 @@ class LoginController extends GetxController {
     }
   }
 
+  /// Call to server to get the email if it is not available during the Apple Sign in.
+  /// [socialId] is the id of the user which is received from the Apple Sign in.
+  /// If response is success then it will call [doLogin] method.
+  /// If response is failure then it will print the error message.
   void getEmailForAppleLogin(String socialId) {
     RequestManager.postRequest(
       uri: EndPoints.getEmailForApple,
@@ -288,6 +306,14 @@ class LoginController extends GetxController {
     passwordController.clear();
   }
 
+  /// It will add the user in fireStore collection.
+  /// If user is from google or apple then it will directly go to dashboard.
+  /// If user is from normal login then it will check if the email is verified or not.
+  /// If email is not verified then it will show a alert to verify the email.
+  /// If email is verified then it will check if the mobile number is verified or not.
+  /// If mobile number is not verified then it will go to OTP screen to verify the mobile number.
+  /// If mobile number is verified then it will go to dashboard.
+  /// If any error occurs then it will go to login screen.
   void createUserInFirebase(UserData userModel) {
     FireStoreServices.addDataWithDocumentId(
       isLoader: true,

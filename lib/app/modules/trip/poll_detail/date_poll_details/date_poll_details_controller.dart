@@ -12,6 +12,11 @@ class DatePollDetailsController extends GetxController {
   RxString restorationId = ''.obs;
   TripDetailsModel? tripDetailsModelObject;
 
+  /// Called when the user changes the index of the bottom tab bar.
+  ///
+  /// It assigns the selected trip to [tripDetailsModelObject] and
+  /// calls [getTripDatePollList] to populate [lstTripDatePoll]
+  /// with date poll details associated with the selected trip.
   void onIndexChange(TripDetailsModel tripDetailsModel) async {
     tripDetailsModelObject = tripDetailsModel;
     printMessage(
@@ -19,6 +24,14 @@ class DatePollDetailsController extends GetxController {
     getTripDatePollList(tripDetailsModel.id.toString());
   }
 
+  /// Gets trip date poll details from API.
+  ///
+  /// This method is used to get trip date poll details from API.
+  /// It takes trip id as parameter and returns trip date poll details
+  /// associated with the trip.
+  /// If request is successfull, it assigns response to [lstTripDatePoll]
+  /// and sets [restorationId] with a random string.
+  /// If request is failed, it shows easy loading.
   void getTripDatePollList(String tripId) {
     RequestManager.postRequest(
       uri: EndPoints.getDatesPollDetails,

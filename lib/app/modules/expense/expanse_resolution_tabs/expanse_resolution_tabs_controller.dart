@@ -52,6 +52,14 @@ class ExpanseResolutionTabsController extends GetxController
     super.onClose();
   }
 
+  /// Gets trip details from API.
+  ///
+  /// This method is used to get trip details from API.
+  /// It takes trip id as parameter and returns trip details.
+  /// If request is successfull, it sets [isDataLoaded] to true and
+  /// assigns response to [tripDetailsModel].
+  /// If request is failed, it shows easy loading and sets [isDataLoaded] to false.
+  /// It also calls [changeTabIndex] with current [tabBarIndex] value.
   void getTripDetails() {
     RequestManager.postRequest(
       uri: EndPoints.getTripDetail,
@@ -70,6 +78,13 @@ class ExpanseResolutionTabsController extends GetxController
       onFailure: (error) {},
     );
   }
+
+  /// Shares the expense report for the current trip.
+  ///
+  /// This method sends a POST request to the [EndPoints.expReport] endpoint.
+  /// It includes the current trip ID in the request body. If the request
+  /// is successful, a success message is displayed. If the request fails,
+  /// a failure message is displayed.
 
   void shareExpanseReport() {
     RequestManager.postRequest(

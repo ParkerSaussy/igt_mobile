@@ -29,6 +29,13 @@ class DocumentsController extends GetxController {
     getTripDocuments(tripId.value);
   }
 
+  /// Converts a given date string into a relative time string.
+  ///
+  /// If the given date is today, it returns a string in the format "hh:mm a".
+  /// If the given date is yesterday, it returns the string "Yesterday".
+  /// Otherwise, it returns a string in the format "dd MMM yyyy".
+  ///
+  /// Example:
   String daysBetween(String crDate) {
     DateTime fromUtc =
         DateFormat("yyyy/MM/dd hh:mm:ss aa").parse(crDate, true).toLocal();
@@ -46,7 +53,16 @@ class DocumentsController extends GetxController {
     return timeAgo;
   }
 
-  /// check selected value
+  
+  /// Select all documents in the list.
+  ///
+  /// [isValue] is `true` to select all documents, or `false` to deselect all.
+  ///
+  /// This will loop through the [docList] and set the [DocumentList.isSelected]
+  /// property of each document to [isValue].
+  ///
+  /// Also, it will set the value of [totalSelected] to the number of selected
+  /// documents.
   void selectAll(bool isValue) {
     totalSelected.value = 0;
     if (isValue) {
@@ -61,7 +77,20 @@ class DocumentsController extends GetxController {
     }
   }
 
-  /// call api for get trip document
+  
+  /// Fetches the list of trip documents from the API.
+  ///
+  /// This method sends a POST request to the [EndPoints.getTripDocuments] endpoint
+  /// using the provided trip ID. If the request is successful, it populates
+  /// [docList] with the retrieved documents and organizes them by their creation
+  /// date. It also updates the [isDocumentFetch] status and generates a new
+  /// [restorationDocId].
+  ///
+  /// If the request fails, it clears the current document lists, updates the
+  /// loading status, and resets the selection state.
+  ///
+  /// [tripId]: The unique identifier of the trip for which documents are to be fetched.
+
   void getTripDocuments(int tripId) {
     RequestManager.postRequest(
         uri: EndPoints.getTripDocuments,
@@ -98,7 +127,13 @@ class DocumentsController extends GetxController {
         });
   }
 
-  /// calculate the uploading file size
+  
+  /// Returns a human-readable string representing the given number of bytes.
+  ///
+  /// The [decimals] parameter specifies the number of decimal places to
+  /// include in the string. It defaults to 0.
+  ///
+  /// Example: getFileSizeString(1234567) => "1.2mb"
   String getFileSizeString({required int bytes, int decimals = 0}) {
     const suffixes = ["b", "kb", "mb", "gb", "tb"];
     if (bytes == 0) return '0${suffixes[0]}';
@@ -106,7 +141,16 @@ class DocumentsController extends GetxController {
     return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + suffixes[i];
   }
 
-  /// call api for particular delete trip from document
+  
+  /// Deletes selected documents from the current trip.
+  ///
+  /// This method sends a POST request to the [EndPoints.deleteTripDocuments] endpoint
+  /// using the list of selected document IDs. If the request is successful, it clears
+  /// the current document lists, updates the loading status and selection state, and
+  /// re-fetches the document list from the server. It also generates a new
+  /// [restorationDocId].
+  ///
+  /// If the request fails, it clears the current document lists and selection state.
   void deleteTripDocuments() {
     RequestManager.postRequest(
         uri: EndPoints.deleteTripDocuments,
@@ -131,7 +175,14 @@ class DocumentsController extends GetxController {
         });
   }
 
-  /// get file extension from url
+  
+  /// Returns the file extension from the given file name.
+  ///
+  /// This method takes a file name and returns its extension by splitting the
+  /// string at the last occurrence of '.' and returning the last part of the
+  /// split result. If the file name does not contain a '.', it returns null.
+  ///
+  /// For example, if the file name is "example.txt", the method returns ".txt".
   String? getFileExtension(String fileName) {
     try {
       return ".${fileName.split('.').last}";

@@ -36,6 +36,12 @@ class SelectTripImageController extends GetxController {
     super.onClose();
   }
 
+  /// This method is used to get the cover images from the server and
+  /// selected index is set according to the selectedWhenBack value.
+  /// If selectedWhenBack value is present then the uploadedImageName is
+  /// set to the same value and imageSelected is set to a random string.
+  /// If selectedWhenBack is empty then the uploadedImageName is set to
+  /// the first image of the list and imageSelected is set to a random string.
   void getCoverImages() {
     RequestManager.getRequest(
       isSuccessMessage: false,
@@ -83,6 +89,17 @@ class SelectTripImageController extends GetxController {
     );
   }
 
+  /// This method is used to upload the trip cover image to the server.
+  ///
+  /// It requires a file which is the image to be uploaded.
+  /// It also requires a loader to be shown while the image is being uploaded.
+  /// It also requires the bearer token to be sent in the request header.
+  /// It also requires the url of the server to be sent in the request.
+  /// It also requires the fileName of the image which is the coverImage.
+  /// If the image is uploaded successfully, it will return the uploaded
+  /// image name in the response body.
+  /// If the image is not uploaded successfully, it will return the error
+  /// message in the response body.
   void uploadTripImages({required File selectedFile}) {
     RequestManager.uploadImage(
       isLoader: true,

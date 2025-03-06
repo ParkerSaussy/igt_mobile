@@ -50,7 +50,13 @@ class AddDocumentController extends GetxController {
     }
   }
 
-  /// get file size calculate for string formate
+  
+  /// Returns a human-readable string representing the given number of bytes.
+  ///
+  /// The [decimals] parameter specifies the number of decimal places to
+  /// include in the string. It defaults to 0.
+  ///
+  /// Example: getFileSizeString(1234567) => "1.2mb"
   String getFileSizeString({required int bytes, int decimals = 0}) {
     const suffixes = ["b", "kb", "mb", "gb", "tb"];
     if (bytes == 0) return '0${suffixes[0]}';
@@ -67,7 +73,10 @@ class AddDocumentController extends GetxController {
     }
   }
 
-  /// pic file from gallery
+  
+  /// Pick files from device and check size is less than 5MB
+  /// if yes then set the flag isUpload to true and set the file size and name
+  /// if size is greater than 5MB then show snack toast with error message
   Future<void> pickFiles() async {
     isUpload.value = false;
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -118,7 +127,12 @@ class AddDocumentController extends GetxController {
     }
   }
 
-  /// call api for upload document on server
+  
+  /// Uploads a file to the server.
+  ///
+  /// This method takes a [File] and uses `RequestManager.uploadImage` to upload
+  /// it to the server. After the image is uploaded, it updates the UI with the
+  /// uploaded image URL.
   void uploadFiles(File file) {
     RequestManager.uploadImage(
       isLoader: true,
@@ -149,7 +163,15 @@ class AddDocumentController extends GetxController {
     );
   }
 
-  /// call api for upload trip document
+  
+  /// Uploads a trip document to the server.
+  ///
+  /// This method takes a file and documents name and uses `RequestManager.postRequest`
+  /// to upload it to the server. After the document is uploaded, it updates the UI
+  /// by popping the current screen.
+  ///
+  /// Parameters:
+  /// - [context]: The context of the screen.
   void uploadTripDocument(context) {
     print("docFileName.value:${docFileName.value}");
     var body = {

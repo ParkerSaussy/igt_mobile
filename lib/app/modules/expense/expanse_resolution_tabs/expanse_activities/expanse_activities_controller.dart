@@ -45,6 +45,13 @@ class ExpanseActivitiesController extends GetxController {
   RefreshController itineraryController =
       RefreshController(initialRefresh: false);
   //Refresh Data
+  /// Refreshes the expense activities data.
+  ///
+  /// This method clears the current list of expense activities,
+  /// generates a new restoration ID, sets the loading state to true,
+  /// and fetches the latest expense activities. A delay of 1 second
+  /// is added to simulate network latency before performing these actions.
+
   void onRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
     expenseActivitiesList.clear();
@@ -53,10 +60,18 @@ class ExpanseActivitiesController extends GetxController {
     getExpenseActivities();
   }
 
+  /// Simulates network latency by waiting 1 second before performing an action.
+  ///
+  /// This is used to load the expense activities when the user pulls up the
+  /// smart refresher.
   void onLoading() async {
     await Future.delayed(const Duration(seconds: 1));
   }
 
+  /// Called when the user changes the index of the bottom tab bar.
+  /// It loads the expense activities for the selected trip.
+  ///
+  /// [tripDetailsModel] is the selected trip.
   void onIndexChange(TripDetailsModel tripDetailsModel) async {
     // getTripDatePollList(tripDetailsModel.id.toString());
     this.tripDetailsModel = tripDetailsModel;
@@ -72,6 +87,14 @@ class ExpanseActivitiesController extends GetxController {
     getExpenseActivities();
   }
 
+  /// Gets expense activities from API.
+  ///
+  /// This method is used to get expense activities from API.
+  /// It takes trip id as parameter and returns expense activities.
+  /// If request is successfull, it assigns response to [expenseActivitiesList] and
+  /// sets [isActivitiesFound] to true.
+  /// If request is failed, it shows easy loading and sets [isActivitiesFound] to false.
+  ///
   void getExpenseActivities() {
     RequestManager.postRequest(
       uri: EndPoints.getActivities,
@@ -97,6 +120,19 @@ class ExpanseActivitiesController extends GetxController {
     );
   }
 
+  /// Gets list of guests in a trip from API.
+  ///
+  /// This method is used to get list of guests in a trip from API.
+  /// It takes trip id as parameter and returns list of guests.
+  /// If request is successfull, it assigns response to [tripGuestList] and
+  /// sets [isListAvailable] to true.
+  /// If request is failed, it shows easy loading and sets [isListAvailable] to false.
+  /// After the list is fetched, a text editing controller is added to the
+  /// textEditingController list for each guest in the trip.
+  /// The value of the text editing controller is added to the textFieldValues list.
+  /// Finally, the selectedGuestList observable list is populated with the
+  /// tripGuestList.
+  ///
   void callGuestListApi() {
     RequestManager.postRequest(
         uri: EndPoints.getTripGuestList,
@@ -143,6 +179,22 @@ class ExpanseActivitiesController extends GetxController {
         });
   }
 
+  /// A widget which displays a list of guests in a trip.
+  ///
+  /// The list is shown in a [ListView] which is inside a [StatefulBuilder].
+  /// This is done so that the list can be rebuilt when the state of the
+  /// [tripGuestList] changes.
+  ///
+  /// Each item in the list is displayed as a [MasterListTile] widget.
+  /// When an item is tapped, the [isSelected] property of the guest is
+  /// toggled and the [restorationId] is set to a new random string.
+  ///
+  /// The [selectedGuestList] is cleared and then populated with the guests
+  /// who are selected.
+  ///
+  /// The widget also includes a "Ask Deposit" button which is shown at the
+  /// bottom of the list. When this button is pressed, the [addDeposit] method
+  /// is called.
   Widget equally() {
     return Expanded(
       child: StatefulBuilder(
@@ -192,6 +244,40 @@ class ExpanseActivitiesController extends GetxController {
     );
   }
 
+  /// This method returns a [Widget] which is a single item in the [ListView]
+  /// in the [equally] method.
+  ///
+  /// The widget is an [InkWell] which is a container with a single child.
+  /// The child is a [Container] which is the content of the widget.
+  ///
+  /// The [Container] has a height of [AppDimens.circleNavBarHeight] and a
+  /// margin of [AppDimens.paddingSmall] on the bottom.
+  ///
+  /// The decoration of the [Container] is a [BoxDecoration] with a border of
+  /// [AppDimens.paddingNano] and a color of [Get.theme.colorScheme.background]
+  /// with an alpha of [Constants.veryLightAlfa].
+  ///
+  /// The background color of the [Container] is [Get.theme.colorScheme.primary]
+  /// with an alpha of [Constants.inputFieldCount] if the guest is selected.
+  ///
+  /// The child of the [Container] is a [Padding] with a child of a [Row].
+  /// The [Row] has a main axis alignment of [MainAxisAlignment.spaceBetween]
+  /// and a cross axis alignment of [CrossAxisAlignment.center].
+  ///
+  /// The first child of the [Row] is a [Row] with two children.
+  /// The first child of the inner [Row] is a [Stack] with two children.
+  /// The first child of the [Stack] is a [Padding] with a child of a
+  /// [CommonNetworkImage] which is the profile picture of the guest.
+  /// The second child of the [Stack] is a [Positioned] with a child of a
+  /// [SvgPicture] which is the selected icon if the guest is selected.
+  ///
+  /// The second child of the inner [Row] is a [Text] with the name of the
+  /// guest.
+  ///
+  /// The second child of the outer [Row] is a [Text] with the amount of the
+  /// guest if the guest is selected.
+  ///
+  /// When the [InkWell] is tapped, the [onTap] method is called.
   Widget itemEqually(int index, Function onTap) {
     return Obx(
       () => InkWell(
@@ -267,6 +353,14 @@ class ExpanseActivitiesController extends GetxController {
     );
   }
 
+  /// Adds a deposit to the trip.
+  ///
+  /// This function is called when the user clicks on the "Add Deposit" button.
+  /// It clears the share list and checks if the selected guest list is empty.
+  /// If the selected guest list is empty, it shows a snackbar with the message
+  /// "Please select guests" and does not add the deposit.
+  /// If the selected guest list is not empty, it adds the deposit for each
+  /// selected guest and calls the [addExpense] function to add the expense.
   void addDeposit() {
     shareList.clear();
     if (selectedGuestList.isEmpty) {
@@ -286,6 +380,14 @@ class ExpanseActivitiesController extends GetxController {
     }
   }
 
+  /// API call to add an expense to the trip.
+  ///
+  /// This API is called when the user clicks on the "Add Deposit" button.
+  /// The response of this API is not stored anywhere.
+  /// If the response is successful, the snackbar is shown with the success message.
+  /// If the response is not successful, the error message is printed.
+  /// The [getExpenseActivities] function is called to get the list of expense activities
+  /// and the screen is popped.
   void addExpense() {
     RequestManager.postRequest(
         uri: EndPoints.addExpense,

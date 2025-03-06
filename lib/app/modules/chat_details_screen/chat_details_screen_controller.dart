@@ -88,6 +88,15 @@ class ChatDetailsScreenController extends GetxController {
     });
   }
 
+  /// Fetches the FCM tokens of the group members and stores them in the
+  /// [lstFcmToken] variable.
+  ///
+  /// This method loops through the member IDs of the group chat stored in the
+  /// [conversationListModel] and fetches the details of each member. It then
+  /// checks if the fetched user ID is different from the current user ID. If
+  /// yes, it adds the FCM token to the [lstFcmToken] variable. If the user ID
+  /// matches the current user ID, it updates the [senderName] with the full
+  /// name of the current user.
   void getFcmTokens() {
     for (int i = 0; i < conversationListModel!.memberIds!.length; i++) {
       FirebaseFirestore.instance
@@ -110,6 +119,12 @@ class ChatDetailsScreenController extends GetxController {
     }
   }
 
+  /// Fetches the FCM token of the receiver in single chat.
+  ///
+  /// This method fetches the FCM token of the receiver in single chat and
+  /// stores it in the [lstFcmToken] variable. It also fetches the details of
+  /// the receiver and stores them in the [receiverDetails] variable. Finally,
+  /// it sets the [isDetailsFetched] variable to true.
   void getFcmTokenForSingleChat() {
     RequestManager.showEasyLoader();
     FirebaseFirestore.instance
@@ -140,6 +155,21 @@ class ChatDetailsScreenController extends GetxController {
     });
   }
 
+  /// Sends a message in a group chat.
+  ///
+  /// This method handles sending a message in a group chat by updating the
+  /// Firestore `tripGroupCollection` with the message details, such as
+  /// message content, sender ID, timestamp, file name, and file type. After
+  /// updating the group collection, it calls `createMessageCollection` to
+  /// add the message to the message collection with the appropriate details,
+  /// including handling different message types (e.g., text or image).
+  ///
+  /// Parameters:
+  /// - [messageType]: An integer representing the type of the message (0 for text, 1 for image).
+  /// - [fileName]: The name of the file associated with the message, if any.
+  /// - [fileType]: The type of the file associated with the message, if any.
+  /// - [imageUrl]: The URL of the image if the message is of type image.
+
   void sendMessageGroupMessage(
       int messageType, String fileName, String fileType, String imageUrl) {
     print("sdfjhbs");
@@ -166,6 +196,20 @@ class ChatDetailsScreenController extends GetxController {
     });
   }
 
+  /// Sends a message in a single chat.
+  ///
+  /// This method handles sending a message in a single chat by updating the
+  /// Firestore `tripGroupCollection` with the message details, such as
+  /// message content, sender ID, timestamp, file name, and file type. After
+  /// updating the group collection, it calls `createMessageCollection` to
+  /// add the message to the message collection with the appropriate details,
+  /// including handling different message types (e.g., text or image).
+  ///
+  /// Parameters:
+  /// - [messageType]: An integer representing the type of the message (0 for text, 1 for image).
+  /// - [fileName]: The name of the file associated with the message, if any.
+  /// - [fileType]: The type of the file associated with the message, if any.
+  /// - [imageUrl]: The URL of the image if the message is of type image.
   void sendMessageForSingleChat(
       int messageType, String fileName, String fileType, String imageUrl) {
     final sendDateTime = FieldValue.serverTimestamp();
@@ -191,6 +235,25 @@ class ChatDetailsScreenController extends GetxController {
     });
   }
 
+  /// Creates a message collection in Firestore for a single chat.
+  ///
+  /// This method adds a document to the `tripMessages` subcollection of the
+  /// `tripGroupCollection` document with the given [docId]. The document
+  /// contains the message details, such as the message content, sender ID,
+  /// timestamp, file name, and file type. The method also handles different
+  /// message types (e.g., text or image). After adding the document, it updates
+  /// the document with the generated ID and clears the text message controller.
+  /// If the message is of type text, it also scrolls to the bottom of the message
+  /// list. If there are FCM tokens for the group, it sends a push notification.
+  ///
+  /// Parameters:
+  /// - [sendDateTime]: The timestamp of when the message was sent.
+  /// - [message]: The content of the message.
+  /// - [messageType]: An integer representing the type of the message (0 for text, 1 for image).
+  /// - [fileName]: The name of the file associated with the message, if any.
+  /// - [fileType]: The type of the file associated with the message, if any.
+  /// - [docId]: The ID of the document in the `tripGroupCollection` to add the
+  ///   message collection to.
   void createMessageCollection(
       {required FieldValue sendDateTime,
       required String message,
@@ -241,6 +304,14 @@ class ChatDetailsScreenController extends GetxController {
     });
   }
 
+  /// Scrolls the message list to the bottom.
+  ///
+  /// This method is called after a message is added to the message list, and
+  /// it is only called if the message type is text. It uses the
+  /// `addPostFrameCallback` method of the `SchedulerBinding` to animate the
+  /// scroll to the bottom of the list after the frame has been built. This
+  /// allows the list to be scrolled to the bottom even if the list is not yet
+  /// at its final size.
   void scrollToBottom() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       scrollController.animateTo(scrollController.position.minScrollExtent,
@@ -249,6 +320,12 @@ class ChatDetailsScreenController extends GetxController {
     });
   }
 
+  /// Uploads a chat image to the server.
+  ///
+  /// This method takes a [File] and uses `RequestManager.uploadImage` to upload
+  /// it to the server. After the image is uploaded, it sends a message to the
+  /// chat with the image URL, either to a single chat or a group chat, depending
+  /// on the value of `isGroup`.
   void uploadChatImage(File file) {
     RequestManager.uploadImage(
       isLoader: true,
@@ -278,6 +355,15 @@ class ChatDetailsScreenController extends GetxController {
     );
   }
 
+  /// Adds a memory to the server.
+  ///
+  /// This method takes a [List] of [File]s and uses `RequestManager.uploadImage` to
+  /// upload each one to the server. After each image is uploaded, it sends a message
+  /// to the chat with the image URL, either to a single chat or a group chat,
+  /// depending on the value of `isGroup`. If the upload is successful, it calls
+  /// `scrollToBottom` to scroll to the bottom of the chat list, and clears the
+  /// temporary list of images. If the upload fails, it shows a snack toast with
+  /// the error message.
   Future<void> addMemory() async {
     File selectedImage;
     int counter = 0;
@@ -355,6 +441,29 @@ class ChatDetailsScreenController extends GetxController {
     }
   }
 
+  /// Send a push notification to the users in the [lstFcmToken] list.
+  ///
+  /// This function is used to send a push notification to the users in the
+  /// [lstFcmToken] list. It takes two parameters, [message] and [messageType].
+  /// The [message] parameter is the message to be sent and the [messageType]
+  /// parameter is the type of message. If the [messageType] is 0, the message
+  /// is a text message. If the [messageType] is 1, the message is an image.
+  ///
+  /// The function first checks if the [lstFcmToken] list is not empty. If it
+  /// is not empty, it constructs the body of the notification. If the chat type
+  /// is single chat, the body of the notification is constructed with the
+  /// registration ids of the users in the [lstFcmToken] list and the data
+  /// of the notification is set to {"type": 'singleChat', 'conversationId':
+  /// [conversationId]}. If the chat type is group chat, the body of the
+  /// notification is constructed with the registration ids of the users in the
+  /// [lstFcmToken] list and the data of the notification is set to
+  /// {"type": 'groupChat', 'tripId': [tripId]}.
+  ///
+  /// The function then sends the notification to the users in the
+  /// [lstFcmToken] list using the [http] package. The function then checks
+  /// the status code of the response. If the status code is 200, the function
+  /// prints a success message. If the status code is not 200, the function
+  /// prints an error message.
   Future<void> sendPushNotification(message, messageType) async {
     printMessage("Send Push No : ${lstFcmToken.length}");
     if (lstFcmToken.isNotEmpty) {

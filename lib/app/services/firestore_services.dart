@@ -47,6 +47,19 @@ class FireStoreParams {
 }
 
 class FireStoreServices {
+  /// Adds data with document ID to the Firestore collection.
+  ///
+  /// This method adds the given data to the Firestore collection with the given
+  /// document ID. It also handles the loader and snack toast.
+  ///
+  /// Parameters:
+  /// - [body] : The data to be added to the Firestore.
+  /// - [documentId] : The document ID to which the data is to be added.
+  /// - [collectionName] : The name of the Firestore collection.
+  /// - [isLoader] : The flag for showing the loader. Default is false.
+  /// - [isFailedMessage] : The flag for showing the failed message. Default is true.
+  /// - [onSuccess] : The callback for the success of the Firestore operation.
+  /// - [onFailure] : The callback for the failure of the Firestore operation.
   static Future<void> addDataWithDocumentId({
     required body,
     required String documentId,
@@ -91,6 +104,18 @@ class FireStoreServices {
     }
   }
 
+  /// Checks if the user exists in Firestore.
+  ///
+  /// This method checks if the user exists in Firestore by querying the
+  /// given collection with the given document ID and field name. It returns
+  /// a future of boolean indicating whether the user exists or not.
+  ///
+  /// Parameters:
+  /// - [documentId] : The ID of the document to be checked.
+  /// - [collectionName] : The name of the Firestore collection.
+  /// - [fieldName] : The name of the field to be queried.
+  /// Returns:
+  /// A Future of boolean indicating whether the user exists or not.
   static Future<bool> userExists(
       {required String documentId,
       required String collectionName,
@@ -102,6 +127,26 @@ class FireStoreServices {
         .then((value) => value.size > 0 ? true : false);
   }
 
+  /// Updates a document in Firestore with the given body.
+  ///
+  /// This method takes the ID of the document to be updated, the name of the
+  /// Firestore collection, a boolean indicating whether to show a loader, a
+  /// boolean indicating whether to show a failure message, and two functions:
+  /// one to be called on success and one to be called on failure.
+  ///
+  /// If [isLoader] is true, it shows a loader until the update is complete.
+  /// If [isFailedMessage] is true, it shows a message if the update fails.
+  ///
+  /// Parameters:
+  /// - [body] : The data to be updated.
+  /// - [documentId] : The ID of the document to be updated.
+  /// - [collectionName] : The name of the Firestore collection.
+  /// - [isLoader] : Whether to show a loader while updating. Defaults to false.
+  /// - [isFailedMessage] : Whether to show a message if the update fails. Defaults to true.
+  /// - [onSuccess] : A callback function to be called when the update is successful.
+  /// - [onFailure] : A callback function to be called when the update fails.
+  /// Returns:
+  /// A Future of void.
   static Future<void> updateDataWithDocumentId({
     required body,
     required String documentId,
@@ -146,6 +191,9 @@ class FireStoreServices {
     }
   }
 
+  /// Listens to the snapshot of the trip with [tripId] from Firestore,
+  /// and if the trip does not exist, navigates to the dashboard screen.
+  ///
   static void checkIfTripExists({required String tripId}) {
     DocumentReference reference = FirebaseFirestore.instance
         .collection(FireStoreCollection.tripGroupCollection)
@@ -159,6 +207,17 @@ class FireStoreServices {
       }
     });
   }
+
+  /// Clears the Firebase token for a user.
+  ///
+  /// This method updates the user's document in the users collection
+  /// in Firestore, setting the Firebase Cloud Messaging (FCM) token
+  /// to an empty string. This effectively clears the token, ensuring
+  /// that the user will no longer receive push notifications until a
+  /// new token is set.
+  ///
+  /// Parameters:
+  /// - [userId] : The ID of the user whose Firebase token is to be cleared.
 
   static void clearFirebaseToken({required String userId}) {
     FirebaseFirestore.instance

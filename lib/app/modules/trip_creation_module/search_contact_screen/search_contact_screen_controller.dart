@@ -40,6 +40,16 @@ class SearchContactScreenController extends GetxController {
     getAllContacts();
   }
 
+  /// Get all contacts from the phone.
+  ///
+  /// This function first checks if the user has given permission to access the
+  /// contacts. If the permission is granted, it fetches all the contacts and
+  /// stores them in the [fetchedContacts] list. If the permission is not
+  /// granted, it shows a snack toast with an error message. If the
+  /// [fetchedContacts] list is empty, it shows a snack toast with a message
+  /// saying that there are no contacts available. If the list is not empty, it
+  /// dismisses the easy loading indicator and calls the [getAddedContactsOfCurrentTrip]
+  /// function.
   Future<void> getAllContacts() async {
     if (await FlutterContacts.requestPermission(readonly: false)) {
       RequestManager.showEasyLoader();
@@ -80,6 +90,19 @@ class SearchContactScreenController extends GetxController {
     }
   }
 
+/// Fetches and updates the list of contacts that are not yet added to the current trip.
+///
+/// This function sends a POST request to the server to retrieve the list of guests
+/// already added to the trip identified by [tripId]. It then compares this list
+/// with the [fetchedSearchContacts] and filters out contacts that are already added,
+/// updating [fetchedSearchContacts] with only those contacts that are not yet in the trip.
+/// Finally, it updates the [fetchedContacts] with this filtered list and generates
+/// a new [fetchedContactsRestorationId] to signify the change.
+///
+/// The function handles successful and failed network responses by updating
+/// [fetchedContactsRestorationId] to a new random string to ensure UI components
+/// can react to the change.
+
   void getAddedContactsOfCurrentTrip() {
     RequestManager.postRequest(
       uri: EndPoints.getTripGuestList,
@@ -115,6 +138,17 @@ class SearchContactScreenController extends GetxController {
     );
   }
 
+  /// Adds the selected contacts to the trip.
+  ///
+  /// This function is called when the user taps the "Add Guest" button in the
+  /// [SearchContactScreen]. It iterates over the list of selected contacts and
+  /// validates that each contact has a selected role. If a contact does not have
+  /// a selected role, it displays a snack toast message and breaks out of the
+  /// loop. If all contacts have a selected role, it adds each contact to the
+  /// [lstAddGuest] and sends a POST request to the server to add the guests to
+  /// the trip identified by [tripId]. If the request is successful, it clears
+  /// the [lstAddGuest], [lstSelectedContact], and navigates back to the previous
+  /// screen. If the request fails, it displays an error message.
   void addGuest() {
     for (int i = 0; i < lstSelectedContact.length; i++) {
       if (lstSelectedContact[i].selectedRole.isEmpty) {

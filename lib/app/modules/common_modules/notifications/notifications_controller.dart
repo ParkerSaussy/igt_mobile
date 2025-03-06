@@ -45,16 +45,36 @@ class NotificationsController extends GetxController {
   }
 
   //Refresh Data
+  /// Refreshes the notification data.
+  ///
+  /// This method resets the notification count to zero and retrieves the
+  /// latest notifications. It includes a delay of 1 second to simulate a
+  /// refresh operation.
+
   void onRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
     gc.loginData.value.notificationCount = 0;
     getNotification();
   }
 
+  /// Simulates a loading operation by pausing for 1 second.
+  ///
+  /// This method is called when the user pulls down to refresh the
+  /// notification data. It's intended to be overridden by subclasses
+  /// that support loading more data.
   void onLoading() async {
     await Future.delayed(const Duration(seconds: 1));
   }
 
+
+  /// Converts a given date string into a relative time string.
+  ///
+  /// If the given date is today, it returns a string in the format "hh:mm a".
+  /// If the given date is yesterday, it returns the string "Yesterday".
+  /// Otherwise, it returns a string in the format "dd MMM yyyy".
+  ///
+  /// Example:
+  /// 
   String daysBetween(String crDate) {
     DateTime fromUtc =
         DateFormat("yyyy/MM/dd hh:mm:ss aa").parse(crDate, true).toLocal();
@@ -72,7 +92,34 @@ class NotificationsController extends GetxController {
     return timeAgo;
   }
 
-  getNotification() {
+  /// Fetches the list of notifications from the server.
+  ///
+  /// This function uses the [RequestManager] to make a POST request to the
+  /// [EndPoints.notificationGet] endpoint. The request body is empty.
+  /// The [isLoader] parameter is set to true, so a loader is displayed
+  /// while the request is in progress.
+  ///
+  /// The [onSuccess] callback is called when the request is successful.
+  /// It takes the response body, message, and status as parameters.
+  /// The response body is a list of notifications, which is converted
+  /// to a list of [NotificationList] objects and stored in the
+  /// [notificationList] property of the controller.
+  /// The [secList] property is also updated with the same list.
+  /// The [newList] property is updated with the grouped list of
+  /// notifications.
+  /// The [notificationFetch] property is set to true.
+  /// The [isDataLoading] property is set to false.
+  /// The [notificationController] is updated with the new list of
+  /// notifications.
+  ///
+  /// The [onFailure] callback is called when the request fails.
+  /// It takes the error as a parameter.
+  /// The [secList], [notificationList], and [newList] properties are
+  /// cleared.
+  /// The [notificationFetch] property is set to false.
+  /// The [isDataLoading] property is set to false.
+  /// The [isSelected] property is set to false.
+  void getNotification() {
     RequestManager.postRequest(
         uri: EndPoints.notificationGet,
         hasBearer: true,
@@ -108,7 +155,18 @@ class NotificationsController extends GetxController {
         });
   }
 
-  deleteNotification(int notificationId, int index) {
+  /// Deletes a notification by its ID.
+  ///
+  /// This function sends a request to delete a specific notification identified
+  /// by the [notificationId]. Upon successful deletion, it updates the user
+  /// model and refreshes the notification list. If the deletion fails, it
+  /// attempts to refresh the notification list to reflect the current state.
+  ///
+  /// Params:
+  /// - [notificationId]: The ID of the notification to be deleted.
+  /// - [index]: The index of the notification in the list (unused in the function).
+
+  void deleteNotification(int notificationId, int index) {
     RequestManager.postRequest(
         uri: EndPoints.notificationDelete,
         hasBearer: true,
@@ -126,6 +184,10 @@ class NotificationsController extends GetxController {
         });
   }
 
+  /// This function will clear all notifications from the server and then fetch the updated notifications.
+  ///
+  /// It will call the [getNotification] function after the success of the clear all notification api.
+  ///
   void clearAllNotification() {
     RequestManager.postRequest(
         uri: EndPoints.notificationDelete,

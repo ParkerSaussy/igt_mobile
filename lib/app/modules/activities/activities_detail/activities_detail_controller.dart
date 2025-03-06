@@ -83,6 +83,13 @@ class ActivitiesDetailController extends GetxController
     super.dispose();
   }
 
+  /// Gets trip details from API
+  ///
+  /// This method is used to get trip details from API.
+  /// It takes trip id as parameter and returns trip details.
+  /// If request is successfull, it sets [isDataLoaded] to true and
+  /// assigns response to [tripDetailsModel].
+  /// If request is failed, it shows easy loading and sets [isDataLoaded] to false.
   void getTripDetails() {
     RequestManager.showEasyLoader();
     RequestManager.postRequest(
@@ -103,6 +110,16 @@ class ActivitiesDetailController extends GetxController
     );
   }
 
+  /// Gets list of activities from API
+  ///
+  /// This method is used to get list of activities from API.
+  /// It takes two parameters, [isLoader] and [filters].
+  /// [isLoader] is used to show or hide loader.
+  /// [filters] is used to filter activities by event type.
+  /// It posts request to [EndPoints.getActivityDetail] with [RequestParams.tripId],
+  /// [RequestParams.filterEventType], [RequestParams.sortBy], [RequestParams.searchText] and [RequestParams.type].
+  /// If request is successfull, it assigns response to [activitiesList] and sets [isListAvailable] to true.
+  /// If request is failed, it shows easy loading and sets [isListAvailable] to false.
   void callActivitiesListApi(bool isLoader) {
     if (isLoader) {
       RequestManager.showEasyLoader();
@@ -141,6 +158,15 @@ class ActivitiesDetailController extends GetxController
         });
   }
 
+  /// Deletes activity from API
+  ///
+  /// This method is used to delete activity from API.
+  /// It takes two parameters, [id] and [index].
+  /// [id] is used to identify which activity to delete.
+  /// [index] is used to remove activity from list.
+  /// It posts request to [EndPoints.deleteActivity] with [RequestParams.activityId].
+  /// If request is successfull, it removes activity from list and shows toast.
+  /// If request is failed, it shows error message.
   void deleteActivity(String id, int index) {
     RequestManager.postRequest(
         uri: EndPoints.deleteActivity,
@@ -165,6 +191,16 @@ class ActivitiesDetailController extends GetxController
         });
   }
 
+  /// Likes or dislikes activity idea
+  ///
+  /// This method is used to like or dislike activity idea.
+  /// It takes three parameters, [id], [likeDislike] and [index].
+  /// [id] is used to identify which activity idea to like or dislike.
+  /// [likeDislike] is used to specify whether to like or dislike.
+  /// [index] is used to update like or dislike count in list.
+  /// It posts request to [EndPoints.likeDislikeIdeas] with [RequestParams.activityId] and [RequestParams.likeOrDislike].
+  /// If request is successfull, it shows toast and updates like or dislike count in list.
+  /// If request is failed, it shows error message.
   void likeDislikeIdeas(String id, String likeDislike, int index) {
     RequestManager.postRequest(
         uri: EndPoints.likeDislikeIdeas,
@@ -195,6 +231,16 @@ class ActivitiesDetailController extends GetxController
         });
   }
 
+  /// Makes activity as trip itinerary
+  ///
+  /// This method is used to make activity as trip itinerary.
+  /// It takes three parameters, [id], [isItinerary] and [index].
+  /// [id] is used to identify which activity to make as trip itinerary.
+  /// [isItinerary] is used to specify whether to make it as trip itinerary or not.
+  /// [index] is used to remove activity from list after making it as trip itinerary.
+  /// It posts request to [EndPoints.makeItineary] with [RequestParams.activityId], [RequestParams.isItineary] and [RequestParams.tripId].
+  /// If request is successfull, it shows toast and removes activity from list.
+  /// If request is failed, it shows error message.
   void makeItineary(String id, String isItinerary, int index) {
     RequestManager.postRequest(
         uri: EndPoints.makeItineary,
@@ -223,6 +269,12 @@ class ActivitiesDetailController extends GetxController
         });
   }
 
+  /// Gets the list of filters to be applied on activity list
+  ///
+  /// This method is used to get the list of filters to be applied on activity list.
+  /// It adds the respective filter type to the list if the filter is selected.
+  /// If any filter is selected, it sets [isFilterApplied] to true.
+  /// It returns the list of filters.
   List<String> getFilters() {
     if (gc.isOne.value) {
       filters.add("dining");
@@ -242,6 +294,12 @@ class ActivitiesDetailController extends GetxController
     return filters;
   }
 
+  /// Gets the selected sort by filter.
+  ///
+  /// This method is used to get the selected sort by filter.
+  /// It returns the selected sort by filter.
+  /// If the selected sort by filter is "upcoming", it returns [ShortBy.upcoming].
+  /// If the selected sort by filter is "hidePast", it returns [ShortBy.hidePast].
   String getSortByFilter() {
     if (gc.sortBy.value == "0") {
       sortBy = ShortBy.upcoming;
@@ -251,6 +309,16 @@ class ActivitiesDetailController extends GetxController
     return sortBy;
   }
 
+  /// Refreshes all the controllers.
+  ///
+  /// This method is used to refresh all the controllers
+  /// used in the activity details screen.
+  /// It calls the [loadComplete] and [refreshCompleted] methods
+  /// of all the controllers.
+  /// It also regenerates the [restorationId].
+  ///
+  /// This method is used when the user wants to refresh the
+  /// activity details screen.
   void refreshMethod() {
     othersController.loadComplete();
     othersController.refreshCompleted();
@@ -260,6 +328,18 @@ class ActivitiesDetailController extends GetxController
     ideasController.refreshCompleted();
     restorationId.value = getRandomString();
   }
+
+  /// Opens a bottom sheet for the specified activity.
+  ///
+  /// This method displays a bottom sheet that provides additional details about
+  /// the given [activityDetailsModel]. It checks if there are activities in the
+  /// [activitiesList] and, if so, opens a bottom sheet. The bottom sheet's scroll
+  /// control is determined by whether the activity type is "flight". If the
+  /// [activitiesList] is empty, it shows a toast message indicating no activities
+  /// were found.
+  ///
+  /// The [activityDetailsModel] parameter is required and contains information
+  /// about the activity to be displayed in the bottom sheet.
 
   void openOthersBottomSheet(
       {required ActivityDetailsModel activityDetailsModel}) {
@@ -277,6 +357,21 @@ class ActivitiesDetailController extends GetxController
     }
   }
 
+  /// Returns a bottom sheet widget with the activity details.
+  ///
+  /// This method returns a bottom sheet widget with the activity details.
+  /// It takes an [activityDetailsModel] as a required parameter which contains
+  /// information about the activity to be displayed in the bottom sheet.
+  /// The bottom sheet's scroll control is determined by whether the activity type
+  /// is "flight". If the activity type is "flight", the bottom sheet is not
+  /// scrollable. Otherwise, the bottom sheet is scrollable.
+  /// It returns a different widget based on the activity type.
+  /// If the activity type is "hotel", it returns an [ActivityWidget].
+  /// If the activity type is "flight", it returns an [ActivityFlightWidget].
+  /// If the activity type is "dining", it returns an [ActivityDiningWidget].
+  /// If the activity type is "event", it returns an [ActivityEventWidget].
+  /// If the activity type is anything else, it returns an empty [Container].
+  ///
   Widget activityBottomSheet(
       {required ActivityDetailsModel activityDetailsModel}) {
     return FractionallySizedBox(

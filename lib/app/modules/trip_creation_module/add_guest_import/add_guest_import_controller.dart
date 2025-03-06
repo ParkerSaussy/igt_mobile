@@ -40,6 +40,20 @@ class AddGuestImportController extends GetxController {
     isTripFinalized.value = Get.arguments[2];
   }
 
+  /// This function is used to add the guest to the trip.
+  ///
+  /// It will create the [AddGuestModel] object from the user input and add it to the [lstAddGuest].
+  /// Then it will call the [RequestManager.postRequest] to add the guest to the trip.
+  /// If the API call is success, it will clear all the text editing controllers, reset the [countryCode] to "+1",
+  /// reset the [selectedGuest] to "Guest", clear the [lstAddGuest] and set the [activationMode] to disabled.
+  /// If the API call fails, it will print the error message.
+  ///
+  /// The API endpoint is [EndPoints.addGuestToTrip].
+  ///
+  /// The request body is a list of [AddGuestModel] objects in the form of a map.
+  /// The map contains the key value pairs of guest details.
+  /// The keys are [RequestParams.tripId], [RequestParams.firstName], [RequestParams.lastName], [RequestParams.emailId], [RequestParams.phone], [RequestParams.role], [RequestParams.isCoHost], [RequestParams.inviteStatus].
+  /// The values are the respective values of the guest details.
   void addGuestAPI() {
     lstAddGuest.add(AddGuestModel(
         tripId: tripId.toString(),

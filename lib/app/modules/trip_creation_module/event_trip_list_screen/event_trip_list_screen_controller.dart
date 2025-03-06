@@ -24,6 +24,14 @@ class EventTripListScreenController extends GetxController {
     callApiForGetTripList();
   }
 
+  /// Gets list of trips from API.
+  ///
+  /// This method is used to get list of trips from API.
+  /// It posts request to [EndPoints.getTripsList] with [RequestParams.tripType] set to "all".
+  /// If request is successfull, it assigns response to [lstTrip] and sets [isTripFetch] based
+  /// on whether the list is not empty. It also sets a random value to [restorationId] and
+  /// sets [isDataLoading] to false.
+  /// If request is failed, it sets [isTripFetch] to false and [isDataLoading] to false.
   void callApiForGetTripList() {
     RequestManager.postRequest(
         uri: EndPoints.getTripsList,

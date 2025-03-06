@@ -21,6 +21,14 @@ class HelpScreenController extends GetxController {
     getCMS();
   }
 
+  /// Fetches CMS data for the help section from the server.
+  ///
+  /// This function sends a POST request to the CMS endpoint with the 'Help' type
+  /// specified in the request body. Upon a successful response, it parses the
+  /// CMS data to extract the description and updates the `termscond` observable
+  /// with the HTML content. The HTML document is also parsed and stored in the
+  /// `document` variable. If the request fails, an error message is printed.
+
   void getCMS() async {
     var body = {
       RequestParams.type: "Help",

@@ -36,6 +36,12 @@ class PollDetailController extends GetxController
     changeTabIndex(tabBarIndex.value);
   }
 
+  /// Changes the tab index and updates the corresponding poll details.
+  ///
+  /// [index] is the new tab index to switch to. If the index is 0, it loads
+  /// the date poll details for the current trip. If the index is 1, it loads
+  /// the city poll details. The method updates the UI based on the new index.
+
   void changeTabIndex(int index) {
     tabBarIndex.value = index;
     if (index == 0) {

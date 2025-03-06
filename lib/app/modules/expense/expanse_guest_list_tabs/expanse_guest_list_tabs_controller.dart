@@ -42,6 +42,19 @@ class ExpanseGuestListTabsController extends GetxController
     callGuestListApi();
   }
 
+  /// API call to get the list of guests in the trip.
+  ///
+  /// This API is called when the user opens the add expense screen.
+  /// The response of this API is stored in the tripGuestList observable list.
+  /// If the list is not empty, the isListAvailable observable is set to true.
+  /// Otherwise, it is set to false.
+  /// After the list is fetched, a text editing controller is added to the
+  /// textEditingController list for each guest in the trip.
+  /// The text of the text editing controller is set to the remaining amount
+  /// for the guest whose id matches the guestId value.
+  /// The value of the text editing controller is added to the textFieldValues list.
+  /// Finally, the selectedGuestList observable list is populated with the
+  /// tripGuestList.
   void callGuestListApi() {
     RequestManager.postRequest(
         uri: EndPoints.getTripGuestList,
@@ -80,6 +93,10 @@ class ExpanseGuestListTabsController extends GetxController
         });
   }
 
+  /// This function divides the total amount by the number of selected guests
+  /// and returns the result as a string with two decimal places. If there are
+  /// no selected guests, it shows a toast message saying "Please select item"
+  /// and does not divide the amount.
   String amountDividedInGuest() {
     double amountDivided = 0;
     if (selectedGuestList.isEmpty) {

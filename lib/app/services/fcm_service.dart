@@ -26,6 +26,27 @@ class FcmService {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  /// Initialize the local notification plugin.
+  ///
+  /// This function will be called when the app is initialized.
+  /// It will initialize the local notification plugin with the default settings.
+  /// When the user taps on a notification, it will navigate to the corresponding screen.
+  /// If the user is not logged in, it will navigate to the login screen.
+  /// If the user is logged in, it will navigate to the corresponding screen based on the type of notification.
+  /// The type of notification is determined by the 'type' key in the payload of the notification.
+  /// The following types are supported:
+  /// - groupChat: Navigate to the chat details screen with the trip id and type as groupChat.
+  /// - singleChat: Navigate to the chat details screen with the conversation id and type as singleChat.
+  /// - invite: Navigate to the trip detail screen with the trip id.
+  /// - due_date: Navigate to the trip detail screen with the trip id.
+  /// - accept_invite: Navigate to the trip detail screen with the trip id.
+  /// - reject_invite: Navigate to the trip detail screen with the trip id.
+  /// - add_city: Navigate to the trip detail screen with the trip id.
+  /// - add_date: Navigate to the trip detail screen with the trip id.
+  /// - activity: Navigate to the activities detail screen with the trip id.
+  /// - plan: Navigate to the subscription plan screen.
+  /// - trip: Navigate to the trip detail screen with the trip id.
+  /// - ge: Navigate to the expense resolution tabs screen with the trip id.
   Future<void> initLocalNotification() async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
@@ -96,6 +117,13 @@ class FcmService {
     );
   }
 
+  /// Decodes the payload of a notification.
+  ///
+  /// The payload is expected to be a string in the format of a JSON object.
+  /// The function will split the string into key-value pairs and return a map.
+  ///
+  /// For example, if the payload is '{"key1":"value1","key2":"value2"}',
+  /// the function will return {key1: value1, key2: value2}.
   Map<String, String> decodePayload(String payload) {
     var entries = payload
         .substring(1, payload.length - 1)
@@ -115,6 +143,30 @@ class FcmService {
     });
   }
 
+  /// Register notification
+  ///
+  /// This function will request permission for push notifications,
+  /// and set up the notification channel.
+  ///
+  /// If the user is not logged in, it will not request permission.
+  ///
+  /// If the user is logged in, it will request permission and set up the notification channel.
+  /// It will also listen for the following events:
+  /// - `onMessage`: When a message is received while the app is in the foreground.
+  /// - `onMessageOpenedApp`: When a message is received while the app is in the background.
+  /// - `onBackgroundMessage`: When a message is received while the app is in the background.
+  ///
+  /// The notification will be displayed using the local notification plugin.
+  /// The notification will have the following properties:
+  /// - `title`: The title of the notification.
+  /// - `body`: The body of the notification.
+  /// - `payload`: The payload of the notification.
+  /// - `sound`: The sound of the notification.
+  /// - `badge`: The badge of the notification.
+  /// - `vibrate`: The vibration of the notification.
+  /// - `channelId`: The id of the notification channel.
+  /// - `channelName`: The name of the notification channel.
+  /// - `channelDescription`: The description of the notification channel.
   Future<void> registerNotification() async {
     channel = const AndroidNotificationChannel(
       'high_importance_channel', // id

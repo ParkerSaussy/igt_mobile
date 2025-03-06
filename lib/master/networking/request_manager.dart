@@ -270,6 +270,38 @@ class RequestManager {
   static bool isActive = false;
 
 // api post request
+  /// This function makes a POST request to the given [uri] with the
+  /// given [body] and [header] parameters. If [jsonEncoded] is true,
+  /// the [body] is JSON encoded before being sent.
+  ///
+  /// If [hasBearer] is true, the bearer token is added to the [header].
+  ///
+  /// If [isLoader] is true, an EasyLoading loader is shown while the request is in progress.
+  ///
+  /// If the request is successful, the [onSuccess] callback is called
+  /// with the response body, message, and status as parameters.
+  ///
+  /// If the request fails, the [onFailure] callback is called
+  /// with the error message as a parameter.
+  ///
+  /// If the request fails with a 401 status code, the user is logged out
+  /// and the [onFailure] callback is called with the error message as a parameter.
+  ///
+  /// If the request fails with a 404 status code, a snack toast is shown
+  /// with the error message and the [onFailure] callback is called with the
+  /// error message as a parameter.
+  ///
+  /// If the request fails with a 500 status code, a snack toast is shown
+  /// with the error message "Something went wrong, Try again later..."
+  /// and the [onFailure] callback is called with the error message as a parameter.
+  ///
+  /// If the request fails with a timeout, a snack toast is shown
+  /// with the error message "Error : TimeOut" and the [onFailure] callback is called
+  /// with the error message as a parameter.
+  ///
+  /// The [onConnectionFailed] callback is called if the device is not connected
+  /// to the internet. If [onConnectionFailed] is null, a snack toast is shown
+  /// with the error message "Check your internet connection".
   static void postRequest({
     required String uri,
     body,
@@ -383,7 +415,28 @@ class RequestManager {
     });
   }
 
-// api get request
+  /// Make a GET request to the specified [uri].
+  ///
+  /// The following parameters can be specified:
+  ///
+  /// * [body]: The request body. If [jsonEncoded] is true, the body is
+  ///   first encoded as a JSON string.
+  /// * [isBtnLoader]: Whether to display a loader button.
+  /// * [jsonEncoded]: Whether to encode the request body as JSON.
+  /// * [hasBearer]: Whether to include the bearer token in the request header.
+  /// * [isLoader]: Whether to display a full screen loader.
+  /// * [isSuccessMessage]: Whether to display a success message.
+  /// * [isFailedMessage]: Whether to display a failure message.
+  /// * [onSuccess]: The callback that is called when the request is successful.
+  /// * [onFailure]: The callback that is called when the request fails.
+  /// * [onConnectionFailed]: The callback that is called when the request fails due to a connection error.
+  ///
+  /// If the request fails, the [onFailure] callback is called with the error
+  /// message as a parameter. If the request fails due to a connection error,
+  /// the [onConnectionFailed] callback is called instead. If the request is
+  /// successful, the [onSuccess] callback is called with the response body
+  /// and message as parameters.
+
   static getRequest(
       {required uri,
       body,
@@ -457,6 +510,17 @@ class RequestManager {
     });
   }
 
+  /// Uploads a file to the server.
+  ///
+  /// This method takes a [File], a url and a boolean value to show a loader or not.
+  /// It also takes two functions, one for success and one for failure.
+  /// This method will add the bearer token to the request if the boolean value `hasBearer` is true.
+  /// If the connection is not available, it will show a toast with a message to check the internet connection.
+  /// If the request is successful, it will execute the [onSuccess] function and if the request fails, it will execute the [onFailure] function.
+  /// If the boolean value `isSuccessMessage` is true, it will show a toast with a success message.
+  /// It will also show a toast with an error message if the request fails.
+  /// If the request times out, it will also show a toast with an error message.
+  ///
   static uploadImage({
     @required uri,
     required File file,
@@ -536,6 +600,19 @@ class RequestManager {
     });
   }
 
+  /// This method is used to upload the image to the server.
+  ///
+  /// It requires a uri which is the server url to be sent in the request.
+  /// It also requires a file which is the image to be uploaded.
+  /// It also requires a loader to be shown while the image is being uploaded.
+  /// It also requires the bearer token to be sent in the request header.
+  /// It also requires the fileName of the image which is the image to be uploaded.
+  /// It also requires the fileNameThumb of the image which is the thumbnail of
+  /// the image to be uploaded.
+  /// If the image is uploaded successfully, it will return the uploaded
+  /// image name in the response body.
+  /// If the image is not uploaded successfully, it will return the error
+  /// message in the response body.
   static uploadImageThumb(
       {@required uri,
       required File file,
@@ -646,6 +723,16 @@ class RequestManager {
     }
   }
 
+  /// This method is used to upload an image to the server.
+  ///
+  /// It requires a uri which is the server url to be sent in the request.
+  /// It also requires a file which is the image to be uploaded.
+  /// It also requires a loader to be shown while the image is being uploaded.
+  /// It also requires the bearer token to be sent in the request header.
+  /// If the image is uploaded successfully, it will return the uploaded
+  /// image name in the response body.
+  /// If the image is not uploaded successfully, it will return the error
+  /// message in the response body.
   static uploadEventImage({
     @required uri,
     required File file,
@@ -715,6 +802,26 @@ class RequestManager {
       onFailure('Error : TimeOut');
     });
   }
+
+  /// Uploads an artwork image to the server.
+  ///
+  /// This method uploads an image file to the specified [uri] using a multipart
+  /// POST request. It supports optional parameters and headers, including a
+  /// bearer token if [hasBearer] is set to true.
+  ///
+  /// The [file] parameter is the image file to be uploaded.
+  ///
+  /// If [parameters] are provided, they are included as form fields in the request.
+  ///
+  /// If [isLoader] is true, a loading indicator is shown during the upload.
+  ///
+  /// The [onSuccess] callback is invoked with the response data if the upload is successful.
+  ///
+  /// The [onFailure] callback is invoked with an error message if the upload fails.
+  ///
+  /// The [onConnectionFailed] callback is invoked with a message if there is no internet connection.
+  ///
+  /// Throws a timeout error if the request takes longer than the specified timeout duration.
 
   static uploadArtworkImage({
     @required uri,
@@ -786,7 +893,22 @@ class RequestManager {
     });
   }
 
+  
+  /// Handles failed responses from the API.
   ///
+  /// This method is called when an API request fails.
+  ///
+  /// If [isBtnLoader] is true, a button loader is hidden.
+  ///
+  /// If [isLoader] is true, a full-screen loader is hidden.
+  ///
+  /// A toast message is shown with the [message] provided.
+  ///
+  /// The [onFailure] callback is invoked with the [message] provided.
+  ///
+  /// If the message is "Token Mismatched.", "Token is mismatched", or
+  /// "Authorization token is required", the user is logged out after a 2
+  /// second delay.
   static void responseFailed(
       bool isBtnLoader, bool isLoader, String message, Function onFailure) {
     printMessage(message);
@@ -804,7 +926,27 @@ class RequestManager {
     }
   }
 
+  
+  /// Shows a snack bar with a message.
   ///
+  /// The message is specified by [message]. If [message] is not provided, a
+  /// default message of "Alert" is used.
+  ///
+  /// The color of the text is specified by [colorText]. If [colorText] is not
+  /// provided, the default text color of the theme is used.
+  ///
+  /// The background color of the snack bar is specified by [backgroundColor].
+  /// If [backgroundColor] is not provided, the default background color of the
+  /// theme is used.
+  ///
+  /// The style of the text is specified by [contentTextStyle]. If
+  /// [contentTextStyle] is not provided, the default text style of the theme is
+  /// used.
+  ///
+  /// The snack bar is shown using [ScaffoldMessenger.showSnackBar].
+  ///
+  /// The snack bar is floating, meaning it will not block the underlying
+  /// content.
   static void getSnackToast(
       {String message = "Alert",
       Color? colorText,
@@ -871,6 +1013,11 @@ class RequestManager {
     );
   }*/
 
+  /// Show a loading indicator using the EasyLoading package, with a custom appearance.
+  ///
+  /// The indicator is a three-bounce animation with a custom color and font, and is
+  /// displayed for 3 seconds. The user cannot interact with the app while the indicator
+  /// is visible.
   static void showEasyLoader() {
     EasyLoading.instance
       ..displayDuration = const Duration(seconds: 3)
@@ -890,7 +1037,13 @@ class RequestManager {
     EasyLoading.show();
   }
 
+
+  /// Handle unauthorized error by refreshing the token if not already in progress.
   ///
+  /// This method checks if token refreshing is currently not in progress, sets
+  /// the flag to indicate token refreshing, clears user preferences, and navigates
+  /// the user to the login screen.
+
   static void handleUnauthorizedError() {
     if (!isRefreshingToken) {
       isRefreshingToken = true;

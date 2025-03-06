@@ -33,6 +33,25 @@ class _BiomatericAuthState extends State<BiomatericAuth> {
     authBiometrics();
   }
 
+  /// Authenticate the user using biometric authentication. If the user is
+  /// successfully authenticated, the app will navigate to the next screen.
+  /// If the user is not authenticated, the app will show an alert dialog
+  /// asking the user to authenticate.
+  ///
+  /// If the device does not support biometric authentication, the app
+  /// will navigate to the next screen. If the device does not have any
+  /// biometric authentication enrolled, the app will show an alert dialog
+  /// asking the user to enroll.
+  ///
+  /// If the user is locked out or permanently locked out of biometric
+  /// authentication, the app will navigate to the next screen.
+  ///
+  /// If biometric authentication is not available, the app will show an
+  /// alert dialog asking the user to authenticate on iOS, and will navigate
+  /// to the next screen on Android.
+  ///
+  /// If any other error occurs, the app will show a snack toast with the
+  /// error message.
   Future<void> authBiometrics() async {
     final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
     final bool canAuthenticate =
@@ -74,6 +93,32 @@ class _BiomatericAuthState extends State<BiomatericAuth> {
     }
   }
 
+  /// Navigate to the next screen based on the type of message.
+  ///
+  /// If `isClose` is true, navigate back.
+  /// If `message` is null, navigate to the dashboard screen.
+  /// If `message.type` is 'groupChat', navigate to the chat details screen
+  /// with the trip ID and type as 'groupChat'.
+  /// If `message.type` is 'singleChat', navigate to the chat details screen
+  /// with the conversation ID and type as 'singleChat'.
+  /// If `message.type` is 'invite', navigate to the trip detail screen
+  /// with the trip ID.
+  /// If `message.type` is 'due_date', navigate to the trip detail screen
+  /// with the trip ID.
+  /// If `message.type` is 'accept_invite', navigate to the trip detail screen
+  /// with the trip ID.
+  /// If `message.type` is 'reject_invite', navigate to the trip detail screen
+  /// with the trip ID.
+  /// If `message.type` is 'add_city', navigate to the trip detail screen
+  /// with the trip ID.
+  /// If `message.type` is 'add_date', navigate to the trip detail screen
+  /// with the trip ID.
+  /// If `message.type` is 'plan', navigate to the subscription plan screen.
+  /// If `message.type` is 'activity', navigate to the activities detail screen
+  /// with the trip ID.
+  /// If `message.type` is 'ge', navigate to the expense resolution tabs screen
+  /// with the trip ID.
+  /// If `message.type` is none of the above, navigate to the dashboard screen.
   void goToNextScreen(){
     if(widget.isClose){
       Get.back();
@@ -124,6 +169,12 @@ class _BiomatericAuthState extends State<BiomatericAuth> {
       }
     }
   }
+
+  /// Displays an alert dialog informing the user that the app is locked 
+  /// and requires authentication for access.
+  ///
+  /// The dialog provides an option to 'Unlock now', which will close 
+  /// the dialog and trigger the biometric authentication process.
 
   void _showAlertDialog() {
     showDialog(

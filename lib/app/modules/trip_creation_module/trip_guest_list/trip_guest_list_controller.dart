@@ -32,6 +32,16 @@ class TripGuestListController extends GetxController {
     getAddedContacts();
   }
 
+  /// This method is used to get the added guest list from the server.
+  /// We are clearing the lstAddedGuestModel and then adding the data
+  /// to lstAddedGuestModel and lstAddedGuestSearchData.
+  /// We are also saving the uId of the guest in lstIds.
+  /// If lstIds is not empty then we are calling updateMemberInFireStore
+  /// to update the member status in the firestore.
+  /// If there is an error then we are calling updateMemberInFireStore
+  /// to update the member status in the firestore.
+  /// If the lstAddedGuestSearchData is empty then we are navigating to
+  /// ADD_GUEST_IMPORT screen.
   void getAddedContacts() {
     RequestManager.postRequest(
       uri: EndPoints.getTripGuestList,
@@ -62,6 +72,14 @@ class TripGuestListController extends GetxController {
     );
   }
 
+  /// This method is used to get the added guest list of the current trip.
+  /// If the data is fetched successfully then it will clear the
+  /// lstAddedGuestSearchData and then add the data to lstAddedGuestSearchData
+  /// and lstAddedGuestModel.
+  /// If there is an error then it will show easy loading and set
+  /// isDataLoading to false.
+  /// After the list is fetched, it will set isDataLoading to false and
+  /// set the restorationId with a random string.
   void getAddedContactsOfCurrentTrip() {
     RequestManager.postRequest(
       uri: EndPoints.getTripGuestList,
@@ -102,6 +120,15 @@ class TripGuestListController extends GetxController {
     );
   }
 
+  /// Adds selected guests to the trip.
+  ///
+  /// This method is used to add guests to the trip.
+  /// It creates the [AddGuestModel] objects from the selected contacts
+  /// and adds them to [lstAddGuest].
+  /// Then it creates the request body by mapping the [lstAddGuest] to a list of maps.
+  /// After that, it calls the [RequestManager.postRequest] to add the guests to the trip.
+  /// If the request is successful, it clears [lstAddGuest] and [lstSelectedContact] and navigates back to the previous screen.
+  /// If the request fails, it clears [lstAddGuest] and prints the error message.
   void addGuest() {
     for (int i = 0; i < lstSelectedContact.length; i++) {
       lstAddGuest.add(AddGuestModel(

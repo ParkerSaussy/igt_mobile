@@ -22,6 +22,16 @@ class ChangePasswordController extends GetxController {
   RxBool isNewPwVisible = false.obs;
   RxBool iscPwVisible = false.obs;
 
+  /// Send a change password request to the server.
+  ///
+  /// This function takes in the current build context and sends a change password
+  /// request to the server. The request body contains the type of the request
+  /// (email), the old password, the new password, and the confirm password.
+  ///
+  /// If the request is successful, the function shows a snack toast with the
+  /// success message, clears the form fields, and navigates back.
+  ///
+  /// If the request fails, the function shows an error message.
   void changePassword(BuildContext context) {
     var body = {
       RequestParams.socialType: RequestParams.email,

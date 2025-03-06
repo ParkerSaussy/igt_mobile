@@ -67,6 +67,18 @@ class CreateTripController extends GetxController {
     //lstReminder = Constants.getReminderDaysList();
   }
 
+  /// Adds a date range to the list of empty dates if it does not already exist.
+  ///
+  /// Checks if the current date range defined by [rangeStart] and [rangeEnd] 
+  /// is not already present in [lstEmptyDate]. If not present, it creates a 
+  /// new `MultiDateSelectionModel` with details including the start and end 
+  /// dates, arrival and leave times, and comments, then adds it to the list.
+  /// Resets the range selection and times, clears the comment, and updates 
+  /// [refreshListDate] to trigger a UI update.
+  ///
+  /// If the date range already exists, it shows a snackbar with an error 
+  /// message indicating that the date range is not addable.
+
   void onDateAdded() {
     final isAddable = lstEmptyDate.where((element) =>
         element.startDate == rangeStart && element.endDate == rangeEnd);
@@ -101,6 +113,11 @@ class CreateTripController extends GetxController {
     }
   }
 
+  /// Resets the date range selection and times, clears the comment, and
+  /// goes back to the previous screen.
+  ///
+  /// Called when the user taps on the cancel button while selecting a date
+  /// range.
   void onDateCancel() {
     rangeStart = null;
     rangeEnd = null;
@@ -110,6 +127,10 @@ class CreateTripController extends GetxController {
     Get.back();
   }
 
+  /// Resets all the values to their default state.
+  ///
+  /// This function is called when the user navigates to the create trip screen
+  /// and is used to clear all the previously entered data.
   void reset() {
     selectedCategory.value = '';
     //selectedReminder.value = '';
@@ -140,17 +161,34 @@ class CreateTripController extends GetxController {
     uploadedImageName.value = "";
   }
 
+  /// Resets the `isSelected` property of all the items in `lstCitySearch`
+  /// to `false`.
+  ///
+  /// This function is used to clear all the previously selected cities when
+  /// the user navigates to the create trip screen and is used to clear all the
+  /// previously entered data.
   void changeParameterForAllCityList() {
     for (var item in lstCitySearch) {
       item.isSelected = false;
     }
   }
 
+  /// Returns a date string in the format of "dd MMM" from the given
+  /// [DateTime] object.
+  ///
+  /// The date string is in the format of "dd MMM", where "dd" is the day of
+  /// the month with an ordinal suffix (e.g. 1st, 2nd, 3rd, etc.) and "MMM"
+  /// is the abbreviated month name (e.g. Jan, Feb, Mar, etc.).
   String getDateString(DateTime date) {
     //return Date.shared().stringFromDate(date, format: cDateFormatDDMMM);
     return "${Date.shared().ordinalSuffixOf(int.parse(Date.shared().getOnlyDateFromDateTime(date)))} ${Date.shared().getMonthNameFromDateTime(date)}";
   }
 
+  /// Returns a string representation of the number of days between two dates.
+  ///
+  /// The method takes two [DateTime] objects and returns a string in the format
+  /// "X days" or "X day" depending on whether the number of days is greater than
+  /// one. The string is translated according to the current locale.
   String getDays(DateTime startDate, DateTime endDate) {
     int days = Date.shared().datesDifferenceInDay(startDate, endDate);
 
@@ -159,9 +197,23 @@ class CreateTripController extends GetxController {
         : '$days ${LabelKeys.day.tr}';
   }
 
+  /// Returns the year as a string from the given [DateTime] object.
+  ///
+  /// The method extracts and returns only the year component of the [startDate]
+  /// in string format.
+
   String getYear(DateTime startDate) {
     return Date.shared().getOnlyYearFromDateTime(startDate);
   }
+
+  /// Fetches a list of cities based on the search text entered by the user.
+  ///
+  /// Sends a POST request to the [EndPoints.getCities] endpoint with the
+  /// search text from [searchCityController]. If the request succeeds,
+  /// it populates [lstCity] and [lstCitySearch] with the response data,
+  /// updates the selection status of cities present in [lstEmptyCity],
+  /// and refreshes the city list. If the request fails, it logs the error
+  /// message.
 
   void getCities() {
     RequestManager.postRequest(
@@ -188,6 +240,13 @@ class CreateTripController extends GetxController {
     );
   }
 
+  /// Validates all the trip data.
+  ///
+  /// This function is used to validate all the input fields of the trip data,
+  /// including the city list, date list, response deadline, reminder, and the
+  /// display image. It shows the appropriate error message if any of the
+  /// fields are blank. If all the fields are valid, it calls the [createTripAPI]
+  /// method to create a new trip.
   void validateTripData() {
     if (formKey.currentState!.validate()) {
       if (lstEmptyCity.isEmpty) {
@@ -221,16 +280,31 @@ class CreateTripController extends GetxController {
     }
   }
 
+  /// Checks whether [date1] is before [date2].
+  ///
+  /// This method takes two dates and returns true if [date1] is before [date2],
+  /// otherwise it returns false.
   bool isDate1BeforeDate2(DateTime date1, DateTime date2) {
     return date1.isBefore(date2);
   }
 
+  /// Formats a given date string to MM/dd/yyyy format.
+  ///
+  /// This method takes a date string in the format of dd/mm/yyyy and
+  /// returns a new string in the format of MM/dd/yyyy.
   String formatDateToMMDDYYYY(String date) {
     printMessage("Date: $date");
     return DateFormat('MM/dd/yyyy')
         .format(DateTime.parse(date.replaceAll('/', '-')));
   }
 
+  /// Checks whether the response deadline date is valid or not.
+  ///
+  /// This method takes into account the following conditions to validate the response deadline date:
+  /// 1. The date should not be before the current date.
+  /// 2. The date should not be the same as the old response deadline date.
+  /// 3. The date should not be before any of the dates in the trip date poll.
+  /// If any of these conditions are not met, the method returns false. Otherwise, it returns true.
   bool checkResponseDeadLine() {
     for (int i = 0; i < lstEmptyDate.length; i++) {
       DateTime date1 =
@@ -243,6 +317,26 @@ class CreateTripController extends GetxController {
     }
     return true;
   }
+
+  /// Sends a request to create a new trip with the provided trip details.
+  ///
+  /// This method constructs request body data including trip dates, cities, image URL,
+  /// and other trip details. It makes a POST request to the [EndPoints.createTrip] 
+  /// endpoint. If the request is successful, it initializes a [TripDetailsModel] from 
+  /// the response and calls [createGroup] to create a group for the trip.
+  ///
+  /// The request body includes:
+  /// - [RequestParams.tripName]: Name of the trip.
+  /// - [RequestParams.tripDescription]: Description of the trip.
+  /// - [RequestParams.itinaryDetails]: Itinerary details of the trip.
+  /// - [RequestParams.responseDeadline]: Deadline for trip response.
+  /// - [RequestParams.reminderDays]: Number of reminder days.
+  /// - [RequestParams.tripImgUrl]: URL of the trip image.
+  /// - [RequestParams.tripDatesList]: List of trip dates with start and end times.
+  /// - [RequestParams.tripCitiesList]: List of city IDs for the trip.
+  ///
+  /// On success, it processes the trip details and creates a group. On failure, it logs
+  /// the error message.
 
   void createTripAPI() {
     var tripDateMap = lstEmptyDate.map((e) {
@@ -297,6 +391,13 @@ class CreateTripController extends GetxController {
     );
   }
 
+  /// This function is used to create a group in the firestore database.
+  ///
+  /// It takes TripDetailsModel and int as parameters.
+  /// It adds the data to the firestore database with the document id as the trip id.
+  /// The data that is added contains the trip id, file name, file type, group data, member ids, message, sender id, and timestamp.
+  /// The group data contains the group admin, group created at, group image, and group name.
+  /// If the data is added successfully, it will navigate to the AddedGuestListScreen with the trip details model, Constants.fromCreateTrip, and created by as arguments.
   void createGroup(TripDetailsModel tripDetailsModel, int createdBy) {
     FireStoreServices.addDataWithDocumentId(
       isLoader: true,
@@ -325,6 +426,13 @@ class CreateTripController extends GetxController {
     );
   }
 
+  /// Starts a periodic timer that checks for changes in the search city text field.
+  ///
+  /// This method initializes a timer that triggers every second. If the text in the
+  /// `searchCityController` differs from the `searchText`, it updates `searchText`
+  /// and calls the `getCities` function to fetch city data based on the new input.
+  /// If a timer already exists, it is canceled before starting a new one.
+
   void startTimer() {
     if (timer != null) {
       timer!.cancel();
@@ -340,6 +448,15 @@ class CreateTripController extends GetxController {
       },
     );
   }
+
+/// Adjusts the number of reminder days.
+///
+/// This method increments or decrements the [noOfReminderDays] based on the 
+/// value of the [add] parameter. If [add] is true, it increments the 
+/// [noOfReminderDays] by 1 until the [maxReminderDays] is reached. If the 
+/// maximum limit is reached, it displays a toast message indicating that the 
+/// maximum limit has been reached. If [add] is false, it decrements the 
+/// [noOfReminderDays] by 1, stopping at zero.
 
   void reminderDateStepper(bool add) {
     if (add) {

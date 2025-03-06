@@ -19,6 +19,17 @@ class ResetPasswordController extends GetxController {
   RxBool isPasswordVisible = false.obs;
   RxBool isConformPasswordVisible = false.obs;
 
+/// Resets the user's password.
+///
+/// This function sends a request to the server to reset the user's password. 
+/// It retrieves the user ID from the stored login response and the new 
+/// password from the conform password controller. If the request is successful, 
+/// it clears the password fields and navigates the user to the login screen. 
+/// If the request fails, an error handler is executed.
+///
+/// Parameters:
+/// - `context` (BuildContext): The build context of the current widget.
+
   void resetPassword(BuildContext context) {
     UserData userData = Preference.getLoginResponse();
     var body = {

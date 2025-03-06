@@ -52,6 +52,17 @@ class AddedGuestListController extends GetxController {
     getAddedContacts();
   }
 
+  
+  /// This method is used to get the added guest list from the server.
+  /// We are clearing the lstAddedGuestModel and then adding the data
+  /// to lstAddedGuestModel and lstAddedGuestSearchData.
+  /// We are also saving the uId of the guest in lstIds.
+  /// If lstIds is not empty then we are calling updateMemberInFireStore
+  /// to update the member status in the firestore.
+  /// If there is an error then we are calling updateMemberInFireStore
+  /// to update the member status in the firestore.
+  /// If the lstAddedGuestSearchData is empty then we are navigating to
+  /// ADD_GUEST_IMPORT screen.
   void getAddedContacts() {
     RequestManager.postRequest(
       uri: EndPoints.getTripGuestList,
@@ -90,6 +101,15 @@ class AddedGuestListController extends GetxController {
     );
   }
 
+  /// Sends an invitation to a guest via API.
+  ///
+  /// This method initiates a POST request to send an invitation to a guest
+  /// identified by [guestId] for a specific trip.
+  /// The request includes the trip ID and guest ID in the body.
+  /// On successful invitation, it prints the response body and refreshes
+  /// the added contacts list by calling [getAddedContacts].
+  /// If the request fails, no specific failure action is taken.
+
   void sendInviteApiCall(String guestId) {
     RequestManager.postRequest(
       uri: EndPoints.sendInvitation,
@@ -108,6 +128,14 @@ class AddedGuestListController extends GetxController {
     );
   }
 
+  /// Removes a guest from a trip.
+  ///
+  /// This method initiates a POST request to remove a guest identified by
+  /// [guestId] from a trip identified by [tripDetailsModel!.id].
+  /// The request includes the trip ID and guest ID in the body.
+  /// On successful removal, it prints the response body and refreshes
+  /// the added contacts list by calling [getAddedContacts].
+  /// If the request fails, no specific failure action is taken.
   void removeGuestApi(String guestId, uid) {
     printMessage("lstId111s: $lstIds");
     //lstIds.removeWhere((element) => element = uid);
@@ -130,6 +158,14 @@ class AddedGuestListController extends GetxController {
     );
   }
 
+  /// Updates the role of a guest in a trip.
+  ///
+  /// This method initiates a POST request to update the role of a guest
+  /// identified by [guestId] in a trip identified by [tripDetailsModel!.id].
+  /// The request includes the trip ID, guest ID, role, and isCoHost in the body.
+  /// On successful update, it refreshes the added contacts list by calling
+  /// [getAddedContacts].
+  /// If the request fails, no specific failure action is taken.
   void updateGuestRole(String guestId, String selectedRole, bool isCoHost) {
     final body = {
       RequestParams.tripId: tripDetailsModel!.id.toString(),
@@ -150,6 +186,17 @@ class AddedGuestListController extends GetxController {
     );
   }
 
+  /// Updates the list of member IDs in the trip group document identified by
+  /// [tripDetailsModel!.id] in the [FireStoreCollection.tripGroupCollection]
+  /// collection with the provided [memberIds].
+  ///
+  /// This method initiates an update request to the Firestore database to
+  /// update the list of member IDs. If the update is successful, it removes all
+  /// IDs from the [lstIds] list except the current user ID. If the update fails,
+  /// no specific failure action is taken.
+  ///
+  /// The [isLoader] parameter specifies whether to show a loader while the
+  /// request is being processed.
   void updateMemberInFireStore(List<dynamic> memberIds, bool isLoader) {
     FireStoreServices.updateDataWithDocumentId(
       isLoader: isLoader,

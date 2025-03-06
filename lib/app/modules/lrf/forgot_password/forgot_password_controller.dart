@@ -18,6 +18,26 @@ class ForgotPasswordController extends GetxController {
   var isPhone = false.obs;
   RxString countryCode = "+1".obs;
 
+  /// Send a forgot password request to the server.
+  ///
+  /// This function takes in the current build context and sends a forgot password
+  /// request to the server. The request body contains the type of the request
+  /// (email or mobile), the email address or mobile number, and the country code
+  /// of the mobile number if it is a mobile request.
+  ///
+  /// If the request is successful, the function checks if the email address is
+  /// verified. If it is not, the function shows an alert dialog with two buttons,
+  /// "No" and "Yes". If the user clicks "No", the dialog is dismissed. If the
+  /// user clicks "Yes", the function navigates to the OTP screen with the email
+  /// address and OTP type set to verify.
+  ///
+  /// If the email address is verified, the function checks if the mobile number
+  /// is verified. If it is not, the function navigates to the OTP screen with the
+  /// mobile number and OTP type set to verify. If the mobile number is verified,
+  /// the function navigates to the OTP screen with the mobile number and OTP type
+  /// set to forgot.
+  ///
+  /// If the request fails, the function shows an error message.
   void forgotPassword(BuildContext context) {
     var body = {
       RequestParams.type:

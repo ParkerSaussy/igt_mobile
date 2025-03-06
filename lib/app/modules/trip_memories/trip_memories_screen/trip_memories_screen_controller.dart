@@ -43,7 +43,16 @@ class TripMemoriesScreenController extends GetxController {
     memoryListing(tripId.value);
   }
 
-  /// call api for get trip document
+  
+  /// API call to get the list of memories in the trip.
+  ///
+  /// This API is called when the user opens the trip memories screen.
+  /// The response of this API is stored in the lstTripMemories observable list.
+  /// The list is then grouped by the date it was created.
+  /// The grouped list is stored in the newList observable map.
+  /// The observable isMemoriesFetch is set to true if the list is not empty.
+  /// Otherwise, it is set to false.
+  /// The observable isDataLoading is set to false after the API call is completed.
   void memoryListing(int tripId) {
     RequestManager.postRequest(
         uri: EndPoints.memoryListing,
@@ -82,7 +91,18 @@ class TripMemoriesScreenController extends GetxController {
         });
   }
 
-  /// call api for delete memory from list
+  
+  /// Sends a request to delete selected memories for the current trip.
+  ///
+  /// This function makes a POST request to the `deleteMemory` endpoint
+  /// with the current trip ID and the list of memory IDs to be deleted.
+  /// If the request is successful, it clears the list of selected trip IDs,
+  /// trip memories, and selected trip images, and refreshes the memory list
+  /// by calling `memoryListing`. It also updates the `gridRestorationId` to
+  /// a new random string to refresh the UI.
+  /// In case of failure, it logs the error, clears the necessary lists,
+  /// and refreshes the UI.
+
   void callApiForDeleteMemory() {
     RequestManager.postRequest(
         uri: EndPoints.deleteMemory,
@@ -112,6 +132,13 @@ class TripMemoriesScreenController extends GetxController {
         });
   }
 
+  /// Makes a request to add a Dropbox URL for the current trip.
+  ///
+  /// This function makes a POST request to the `addDropboxUrl` endpoint
+  /// with the current trip ID and the Dropbox URL entered by the user.
+  /// If the request is successful, it disables the Dropbox link edit
+  /// mode by setting `isDropboxLinkEdit` to `false`. In case of failure,
+  /// it does nothing.
   void callApiForDropboxUrl() {
     RequestManager.postRequest(
         uri: EndPoints.addDropboxUrl,

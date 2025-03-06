@@ -121,6 +121,9 @@ class AddActivitiesScreenController extends GetxController {
     }
   }
 
+  /// This function is used to set the data in hotel view.
+  /// It will take the data from the activityDetailsModel and set it in the respective controllers and variables.
+  /// The data includes hotel name, picked date, number of nights, average nightly cost, total cost, capacity per room, address, room number, check-in time, check-out time, description and URL.
   void setDataIntoHotel() {
     hotelNameController.text = activityDetailsModel?["name"];
     pickedDate.value = DateFormat('MMM dd, yyyy').format(
@@ -140,6 +143,10 @@ class AddActivitiesScreenController extends GetxController {
     urlController.text = activityDetailsModel?["url"];
   }
 
+
+  /// This function is used to set the data in flight view.
+  /// It will take the data from the activityDetailsModel and set it in the respective controllers and variables.
+  /// The data includes flight name, arrival flight number, arrival date, arrival time, departure flight number, departure date, departure time, trip detail and description.
   void setDataIntoFlight() {
     flightTextController.text = activityDetailsModel?["name"];
     flightNumberArrivalTextController.text =
@@ -160,6 +167,9 @@ class AddActivitiesScreenController extends GetxController {
         (250 - tripDetailTextController.text.length).toString();
   }
 
+  /// This function is used to set the data in dining view.
+  /// It will take the data from the activityDetailsModel and set it in the respective controllers and variables.
+  /// The data includes dining name, location, selected date, selected time, cost per person, spent hours, description and description counter.
   void setDataIntoDining() {
     diningNameController.text = activityDetailsModel?["name"];
     diningLocationController.text = activityDetailsModel?["address"];
@@ -173,6 +183,12 @@ class AddActivitiesScreenController extends GetxController {
     descriptionCounterDining.value =
         (250 - addDescriptionController.text.length).toString();
   }
+
+  /// This function is used to set the data in event view.
+  /// It will take the data from the activityDetailsModel and set it in the respective controllers and variables.
+  /// The data includes event name, event date, time in, time out, number of hours spent, 
+  /// event location address, location counter, total cost per person, event description, 
+  /// description counter, and event URL.
 
   void setDataIntoEvent() {
     eventNameController.text = activityDetailsModel?["name"];
@@ -193,6 +209,11 @@ class AddActivitiesScreenController extends GetxController {
     eventUrlController.text = activityDetailsModel?["url"];
   }
 
+  /// This function is used to reset the data in all the views.
+  /// It will reset all the controllers and variables of the respective views.
+  /// The data includes hotel name, average nightly cost, total cost, address, room number, check-in time, check-out time, description, URL,
+  /// flight name, arrival date, arrival time, departure date, departure time, trip detail, event name, event date, time in, time out,
+  /// number of hours spent, event location address, location counter, total cost per person, event description, description counter, and event URL.
   void reset() {
     final currentDate = DateTime.now();
     final String strPickedDate = DateFormat("MMM dd, yyyy").format(currentDate);
@@ -256,6 +277,10 @@ class AddActivitiesScreenController extends GetxController {
     }
   }
 
+  /// This function is used to validate the form according to the selected activity.
+  /// It will check the form fields and show the error messages accordingly.
+  /// If the form is valid, it will call the addEditActivity function and change the selected activity
+  /// to the respective activity.
   void onDataSubmitted() {
     switch (selectedActivity.value) {
       case 0: // Hotel View
@@ -359,6 +384,13 @@ class AddActivitiesScreenController extends GetxController {
     }
   }
 
+  /// This function is used to add/edit activity in trip.
+  /// It will call api according to selected activity type.
+  /// If selected activity is hotel then it will call hotel api.
+  /// If selected activity is flight then it will call flight api.
+  /// If selected activity is dining or event then it will call dining/api.
+  /// It will also show success bottomsheet after successfully added/edited activity.
+  /// It will reset all fields after successfully added/edited activity.
   void addEditActivity() {
     hideKeyboard();
     Get.focusScope?.unfocus();
@@ -422,6 +454,13 @@ class AddActivitiesScreenController extends GetxController {
     );
   }
 
+  /// Displays a success bottom sheet after an activity is added or updated.
+  ///
+  /// The bottom sheet shows a message indicating whether the activity
+  /// was added or updated successfully, followed by a prompt asking
+  /// if the user wants to add more. It contains "Yes" and "No" buttons
+  /// to let the user decide whether to add another activity or not.
+
   Widget successBottomSheet() {
     return Container(
       child: Column(
@@ -475,6 +514,16 @@ class AddActivitiesScreenController extends GetxController {
     );
   }
 
+  /// This function returns the activity type as a string
+  /// depending on the selectedActivity.value.
+  /// 
+  /// The mapping is as follows:
+  /// - 0: "hotel"
+  /// - 1: "flight"
+  /// - 2: "dining"
+  /// - 3: "event"
+  /// 
+  /// This value is used in the API call to add or edit an activity.
   String activityTypeAccordingToActivity() {
     String activityType = "";
     switch (selectedActivity.value) {
@@ -493,6 +542,17 @@ class AddActivitiesScreenController extends GetxController {
     }
     return activityType;
   }
+
+  /// This function returns the name of the activity as a string
+  /// based on the selectedActivity.value. 
+  ///
+  /// The mapping is as follows:
+  /// - 0: Retrieves the hotel name from hotelNameController.
+  /// - 1: Retrieves the flight name from flightTextController.
+  /// - 2: Retrieves the dining name from diningNameController.
+  /// - 3: Retrieves the event name from eventNameController.
+  ///
+  /// This value is used in the API call to add or edit an activity.
 
   String nameAccordingToActivity() {
     String name = "";
@@ -513,6 +573,16 @@ class AddActivitiesScreenController extends GetxController {
     return name;
   }
 
+  /// This function returns the date of the activity as a string in 'yyyy-MM-dd' format,
+  /// depending on the selectedActivity.value.
+  /// 
+  /// The mapping is as follows:
+  /// - 0: Retrieves the date from pickedDate.value (hotel).
+  /// - 1: Retrieves the date from onArrivalDate.value (flight).
+  /// - 2: Retrieves the date from onSelectDate.value (dining).
+  /// - 3: Retrieves the date from onEventDate.value (event).
+  /// 
+  /// This value is used in the API call to add or edit an activity.
   String dateAccordingToActivity() {
     String date = "";
     switch (selectedActivity.value) {
@@ -536,6 +606,16 @@ class AddActivitiesScreenController extends GetxController {
     return date;
   }
 
+  /// This function returns the time of the activity as a string in 'HH:mm:ss' format,
+  /// depending on the selectedActivity.value.
+  /// 
+  /// The mapping is as follows:
+  /// - 0: Retrieves the time from hotelCheckInTime.value (hotel).
+  /// - 1: Retrieves the time from onArrivalTime.value (flight).
+  /// - 2: Retrieves the time from onSelectTime.value (dining).
+  /// - 3: Retrieves the time from timeIn.value (event).
+  /// 
+  /// This value is used in the API call to add or edit an activity.
   String timeAccordingToActivity() {
     String time = "";
     switch (selectedActivity.value) {
@@ -558,6 +638,17 @@ class AddActivitiesScreenController extends GetxController {
     }
     return time;
   }
+
+  /// This function returns the UTC time of the activity as a string in 'yyyy-MM-dd HH:mm:ss' format,
+  /// depending on the selectedActivity.value.
+  /// 
+  /// The mapping is as follows:
+  /// - 0: Parses the date and time from pickedDate.value and hotelCheckInTime.value (hotel).
+  /// - 1: Parses the date and time from onArrivalDate.value and onArrivalTime.value (flight).
+  /// - 2: Parses the date and time from onSelectDate.value and onSelectTime.value (dining).
+  /// - 3: Parses the date and time from onEventDate.value and timeIn.value (event).
+  /// 
+  /// The parsed time is then converted to UTC format.
 
   String timeAccordingToActivityUtc() {
     String time = "";
@@ -590,6 +681,17 @@ class AddActivitiesScreenController extends GetxController {
     return time;
   }
 
+  /// This function returns the checkout time of the activity as a string in 'HH:mm:ss' format,
+  /// depending on the selectedActivity.value.
+  /// 
+  /// The mapping is as follows:
+  /// - 0: Parses the time from hotelCheckOutTime.value (hotel).
+  /// - 1: Parses the time from departureTime.value (flight).
+  /// - 2: Calculates the checkout time by adding numberOfHours.value to onSelectTime.value (dining).
+  /// - 3: Parses the time from timeOut.value (event).
+  /// 
+  /// This value is used in the API call to add or edit an activity.
+
   String checkoutTimeAccordingToActivity() {
     String checkOutTime = "";
     switch (selectedActivity.value) {
@@ -612,12 +714,27 @@ class AddActivitiesScreenController extends GetxController {
     return checkOutTime;
   }
 
+  /// Returns a new string representing the time after adding [hoursToAdd] hours to [time].
+  /// 
+  /// [time] is expected to be in 'h:mm a' format.
+  /// 
+  /// The result is returned in 'HH:mm:ss' format.
   String addHoursToTime(String time, int hoursToAdd) {
     DateTime parsedTime = DateFormat('h:mm a').parse(time);
     DateTime newTime = parsedTime.add(Duration(hours: hoursToAdd));
     return DateFormat('HH:mm:ss').format(newTime);
   }
 
+  /// Returns the description of the activity as a string,
+  /// depending on the selectedActivity.value.
+  /// 
+  /// The mapping is as follows:
+  /// - 0: Retrieves the description from descriptionController.text (hotel).
+  /// - 1: Retrieves the description from flightTextController.text (flight).
+  /// - 2: Retrieves the description from addDescriptionController.text (dining).
+  /// - 3: Retrieves the description from eventDescriptionController.text (event).
+  /// 
+  /// This value is used in the API call to add or edit an activity.
   String descriptionAccordingToActivity() {
     String description = "";
     switch (selectedActivity.value) {
@@ -637,6 +754,16 @@ class AddActivitiesScreenController extends GetxController {
     return description;
   }
 
+  /// Returns the url of the activity as a string,
+  /// depending on the selectedActivity.value.
+  /// 
+  /// The mapping is as follows:
+  /// - 0: Retrieves the url from urlController.text (hotel).
+  /// - 1: Returns an empty string (flight).
+  /// - 2: Returns an empty string (dining).
+  /// - 3: Retrieves the url from eventUrlController.text (event).
+  /// 
+  /// This value is used in the API call to add or edit an activity.
   String urlAccordingToActivity() {
     String url = "";
     switch (selectedActivity.value) {
@@ -656,6 +783,16 @@ class AddActivitiesScreenController extends GetxController {
     return url;
   }
 
+  /// Returns the address of the activity as a string,
+  /// depending on the selectedActivity.value.
+  /// 
+  /// The mapping is as follows:
+  /// - 0: Retrieves the address from addressController.text (hotel).
+  /// - 1: Returns an empty string (flight).
+  /// - 2: Retrieves the address from diningLocationController.text (dining).
+  /// - 3: Retrieves the address from eventLocationAddressController.text (event).
+  /// 
+  /// This value is used in the API call to add or edit an activity.
   String addressAccordingToActivity() {
     String address = "";
     switch (selectedActivity.value) {
@@ -713,6 +850,9 @@ class AddActivitiesScreenController extends GetxController {
     return spentHours;
   }
 
+  /// This function is used to calculate the time difference between two
+  /// given times in the format of HH:MM. The result is then passed to
+  /// the formatDuration function for formatting.
   void timeDifferentCalculator() {
     if (timeIn.value != "HH:MM" && timeOut.value != "HH:MM") {
       DateTime time1 = DateFormat("hh:mm a").parse(timeIn.value);
@@ -732,6 +872,22 @@ class AddActivitiesScreenController extends GetxController {
     }
   }
 
+  /// This function takes a duration in the format of a
+  /// [Duration] object and formats it into a string in
+  /// the format of 'HHH MM' where HH is the number of
+  /// hours and MM is the number of minutes.
+  ///
+  /// The function takes the duration, parses it into its
+  /// component hours and minutes, and then formats them
+  /// into a string. The string is then set as the value
+  /// of the [timeSpent] variable.
+  ///
+  /// A message is also printed to the console with the
+  /// value of [timeSpent] for debugging purposes.
+  ///
+  /// This function is used in the [timeDifferentCalculator]
+  /// function to format the duration between two given
+  /// times.
   void formatDuration(Duration duration) {
     int hours = duration.inHours;
     int minutes = (duration.inMinutes % 60).abs();

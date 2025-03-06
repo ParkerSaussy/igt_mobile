@@ -28,6 +28,13 @@ class ContactusController extends GetxController {
     contactUs();
   }
 
+  /// Sends a contact inquiry with the user's first name, email, and message.
+  /// 
+  /// The function constructs a request body from the text fields, and sends
+  /// a POST request to the 'addInquiry' endpoint. If the request succeeds,
+  /// it displays a success message in a bottom sheet and clears the form.
+  /// If it fails, it disables form validation and logs the error.
+
   void contactUs() {
     var body = {
       RequestParams.firstName: fNameController.text.trim(),
@@ -58,6 +65,11 @@ class ContactusController extends GetxController {
     );
   }
 
+  /// Clears the text fields for first name, email, and message.
+  ///
+  /// This function resets the form by clearing the input controllers,
+  /// disabling form validation, and removing focus from any text fields.
+
   void clear() {
     fNameController.clear();
     emailController.clear();
@@ -66,6 +78,10 @@ class ContactusController extends GetxController {
     Get.focusScope?.unfocus();
   }
 
+  /// Displays a success message in a bottom sheet after the contact form is submitted.
+  /// 
+  /// The widget displays a column with a success icon, a success message, and an OK button.
+  /// The OK button clears the form and closes the bottom sheet.
   Widget successBottomSheet() {
     return SizedBox(
       child: Column(

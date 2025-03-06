@@ -28,6 +28,10 @@ class OtpScreenController extends GetxController {
   RxBool isPhone = false.obs;
   var reciever;
 
+  /// Starts a timer that counts down from 25 seconds. After each second the
+  /// `timeStart` observable is updated with the remaining time in the format
+  /// "mm:ss". When the timer reaches 0, the `isResendVisible` observable is set
+  /// to true and the timer is cancelled.
   void startTimer() {
     timeCounter = Constants.timeCounter;
     timeStart.value = "00:25";
@@ -50,7 +54,9 @@ class OtpScreenController extends GetxController {
     );
   }
 
-  formatHHMMSS() {
+  /// Formats the `timeCounter` in seconds into a string in the format "mm:ss" and assigns it to `timeStart`.
+  /// If `timeCounter` is 0 or less, sets `timeStart` to an empty string and sets `timeCounter` to 0.
+  void formatHHMMSS() {
     if (timeCounter! > 0) {
       printMessage("timeCounter   $timeCounter");
       int minutes = (timeCounter! / 60).truncate();
@@ -92,6 +98,11 @@ class OtpScreenController extends GetxController {
     Get.offAll(BiomatericAuth());
     //Get.offAllNamed(Routes.DASHBOARD);
   }
+  /// Navigate to the next screen based on the fromScreen value.
+  ///
+  /// If fromScreen is [Constants.fromForgot], navigate to the reset password screen.
+  /// If fromScreen is [Constants.fromSignUp], navigate to the dashboard screen.
+  /// Otherwise, also navigate to the dashboard screen.
   void verifyOTP() {
     printMessage("fromScreen = $fromScreen");
     if (fromScreen == Constants.fromForgot) {
@@ -107,6 +118,14 @@ class OtpScreenController extends GetxController {
     }
   }
 
+  /// Sends an OTP to the user's email address or phone number.
+  ///
+  /// The request body contains the type of the request (email or mobile),
+  /// the email address or phone number (with country code), and the OTP type
+  /// (verify or forgot).
+  ///
+  /// If the request is successful, the function clears the OTP text field.
+  /// If the request fails, the function shows an error message.
   void sendOtp() {
     var body = {
       RequestParams.reciverType: isPhone.value ? "mobile" : "email",
@@ -131,6 +150,16 @@ class OtpScreenController extends GetxController {
     );
   }
 
+  /// Verifies an OTP sent to the user's email address or phone number.
+  ///
+  /// The request body contains the type of the request (email or mobile),
+  /// the email address or phone number (with country code), the OTP type
+  /// (verify or forgot), and the OTP sent by the user.
+  ///
+  /// If the request is successful, the function logs in the user and navigates
+  /// to the dashboard. If the user does not exist in Firestore, the function
+  /// creates a new user in Firestore. If the request fails, the function shows
+  /// an error message.
   void verifyOtpAPI() {
     var body = {
       RequestParams.reciverType: isPhone.value ? "mobile" : "email",
@@ -171,6 +200,12 @@ class OtpScreenController extends GetxController {
     pinPutController.clear();
   }
 
+  /// Creates a new user in Firestore.
+  ///
+  /// The function takes a [UserData] object and creates a new user in Firestore
+  /// with the provided data. If the request is successful, the function logs in
+  /// the user and navigates to the dashboard. If the request fails, the function
+  /// shows an error message and navigates to the login screen.
   void createUserInFirebase(UserData userModel) {
     FireStoreServices.addDataWithDocumentId(
       isLoader: true,

@@ -38,6 +38,12 @@ class AddExpansesController extends GetxController
     callGuestListApi();
   }
 
+  /// API call to get the list of guests in the trip.
+  ///
+  /// This API is called when the user opens the add expense screen.
+  /// The response of this API is stored in the tripGuestList observable list.
+  /// If the list is not empty, the isListAvailable observable is set to true.
+  /// Otherwise, it is set to false.
   void callGuestListApi() {
     RequestManager.postRequest(
         uri: EndPoints.getTripGuestList,
@@ -71,6 +77,13 @@ class AddExpansesController extends GetxController
     return null; // Return null if no guest is selected
   }
 
+  /// API call to add an expense to the trip.
+  ///
+  /// This API is called when the user clicks on the "Add Expense" button.
+  /// The response of this API is not stored anywhere.
+  /// If the response is successful, the snackbar is shown with the success message.
+  /// If the response is not successful, the error message is printed.
+  /// The [reset] function is called to reset all the fields.
   void addExpense() {
     RequestManager.postRequest(
         uri: EndPoints.addExpense,
@@ -103,6 +116,12 @@ class AddExpansesController extends GetxController
         });
   }
 
+  /// Resets all the fields in the view.
+  ///
+  /// This function is called when the user clicks on the "Add Expense" button
+  /// and the response of the API is successful.
+  /// It resets the date to the current date, description, amount, paid by, guest ID,
+  /// share list, split, and sets the [activationMode] to [AutovalidateMode.disabled].
   void reset() {
     final currentDate = DateTime.now();
     final String strPickedDate = DateFormat("MMM dd, yyyy").format(currentDate);

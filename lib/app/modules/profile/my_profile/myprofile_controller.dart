@@ -33,6 +33,10 @@ class MyProfileController extends GetxController {
   int? timeCounter;
   var reciever;
 
+  /// Starts a timer that counts down from 25 seconds. After each second the
+  /// `timeStart` observable is updated with the remaining time in the format
+  /// "mm:ss". When the timer reaches 0, the `isResendVisible` observable is set
+  /// to true and the timer is cancelled.
   void startTimer() {
     timeCounter = Constants.timeCounter;
     timeStart.value = "00:25";
@@ -55,7 +59,9 @@ class MyProfileController extends GetxController {
     );
   }
 
-  formatHHMMSS() {
+  /// Formats the `timeCounter` in seconds into a string in the format "mm:ss" and assigns it to `timeStart`.
+  /// If `timeCounter` is 0 or less, sets `timeStart` to an empty string and sets `timeCounter` to 0.
+  void formatHHMMSS() {
     if (timeCounter! > 0) {
       printMessage("timeCounter   $timeCounter");
       int minutes = (timeCounter! / 60).truncate();
@@ -69,6 +75,14 @@ class MyProfileController extends GetxController {
     }
   }
 
+  /// Sends an OTP to the user's registered mobile number.
+  ///
+  /// This function creates a body with the receiver type as mobile, the receiver
+  /// as the concatenation of the country code and the mobile number, and the
+  /// OTP type as verify. It then sends a POST request to the
+  /// [EndPoints.sendOtp] endpoint. If the server responds with a success status,
+  /// it starts a timer for 60 seconds. If the server responds with a failure
+  /// status, it displays an error message.
   void sendOtp() {
     var body = {
       RequestParams.reciverType: RequestParams.mobile,
@@ -92,6 +106,18 @@ class MyProfileController extends GetxController {
       },
     );
   }
+
+  /// Verifies an OTP sent to the user's registered mobile number.
+  ///
+  /// This function constructs a request body with the receiver type as mobile,
+  /// the receiver as the user's mobile number, the OTP type as verify, and the
+  /// OTP entered by the user. The function sends a POST request to the
+  /// [EndPoints.verifyOtp] endpoint to verify the OTP.
+  ///
+  /// If the OTP is verified successfully, it clears the OTP input field,
+  /// updates the user's login response in the preferences, and pops the current
+  /// screen to navigate back. If the OTP verification fails, it displays an
+  /// error message.
 
   void verifyOtpAPI() {
     var body = {
@@ -122,6 +148,12 @@ class MyProfileController extends GetxController {
     );
   }
 
+  /// Fetches the user's profile information from the server.
+  ///
+  /// This method calls the [EndPoints.getProfile] API endpoint to fetch the
+  /// user's profile information. If the response is successful, it sets the
+  /// user's login response in the preferences and updates the [myProfileId].
+  /// If the response fails, it displays an error message.
   void callApiGetProfile() {
     RequestManager.postRequest(
         uri: EndPoints.getProfile,

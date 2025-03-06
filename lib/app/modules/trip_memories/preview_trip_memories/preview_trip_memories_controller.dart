@@ -19,6 +19,12 @@ class PreviewTripMemoriesController extends GetxController {
     pageController = PageController(initialPage: currentIndex.value);
   }
 
+  /// Navigates to the next page of trip memories.
+  ///
+  /// If the current page is the last page, it resets the `currentIndex` to 0 and jumps to the first page.
+  /// Otherwise, it increments the `currentIndex` and jumps to the next page.
+  /// Prints the updated `currentIndex` to the console.
+
   void onNext() {
     if (lstTripMemoriesImage.length - 1 == currentIndex.value) {
       currentIndex.value = 0;
@@ -32,6 +38,12 @@ class PreviewTripMemoriesController extends GetxController {
           duration: const Duration(milliseconds: 300), curve: Curves.ease);*/
     }
   }
+
+  /// Navigates to the previous page of trip memories.
+  ///
+  /// If the current page is the first page, it sets the `currentIndex` to the last page
+  /// and jumps to that page. Otherwise, it decrements the `currentIndex` and jumps to
+  /// the previous page. Prints the current `currentIndex` to the console.
 
   void onPrevious() {
     printMessage("current page: ${currentIndex.value}");

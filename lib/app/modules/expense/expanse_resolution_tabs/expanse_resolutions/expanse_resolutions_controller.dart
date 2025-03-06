@@ -31,6 +31,14 @@ class ExpanseResolutionsController extends GetxController {
     getExpenseResolutions();
   }
 
+  /// Gets expense resolutions from API.
+  ///
+  /// This method is used to get expense resolutions from API.
+  /// It takes trip id as parameter and returns expense resolutions.
+  /// If request is successfull, it assigns response to [expenseResolutionList] and
+  /// sets [isResolutionsFound] to true.
+  /// If request is failed, it shows easy loading and sets [isResolutionsFound] to false.
+  ///
   void getExpenseResolutions() {
     RequestManager.postRequest(
       uri: EndPoints.getResolutions,

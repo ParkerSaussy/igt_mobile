@@ -149,6 +149,15 @@ class TripDetailController extends GetxController {
   }
 
   //Refresh Data
+  /// Refreshes the trip details.
+  ///
+  /// This method performs an asynchronous refresh of the trip details.
+  /// It first delays for a second to simulate a loading time, then
+  /// checks if the current trip exists using the firestore service.
+  /// It retrieves the trip details with loading indicator, updates
+  /// the plan details data and reminder list data, and finally marks
+  /// the refresh operation as completed.
+
   void onRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
     FireStoreServices.checkIfTripExists(tripId: tripId.toString());
@@ -158,12 +167,27 @@ class TripDetailController extends GetxController {
     tripDetailController.refreshCompleted();
   }
 
+  /// Simulates a loading time by delaying for a second.
+  ///
+  /// This method is used for simulating a loading time when the user
+  /// pulls down the screen to refresh the trip details. It simply
+  /// delays for a second before the refresh operation is completed.
   void onLoading() async {
     await Future.delayed(const Duration(seconds: 1));
   }
 
   getWidth() => ((Get.width - 49) / (4));
 
+  /// Gets trip details from API
+  ///
+  /// This method is used to get trip details from API.
+  /// It takes trip id as parameter and returns trip details.
+  /// If request is successfull, it sets [isDataLoaded] to true and
+  /// assigns response to [tripDetailsModel].
+  /// If request is failed, it shows easy loading and sets [isDataLoaded] to false.
+  /// It also calls [changeTabIndex] with current [tabBarIndex] value.
+  ///
+  /// [isLoader] is used to show loader or not.
   void getTripDetails(bool isLoader) {
     isTripDetailsLoaded.value = false;
     RequestManager.showEasyLoader();
@@ -247,6 +271,9 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Starts a periodic timer to search for cities based on the search text
+  /// input by the user. If the search text changes, it cancels the previous
+  /// timer and starts a new one to search for cities with the new search text.
   void startTimer() {
     if (timer != null) {
       timer!.cancel();
@@ -263,6 +290,13 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Calls the API to get the list of cities based on the search text.
+  ///
+  /// Calls [RequestManager.postRequest] with the [EndPoints.getCities] API,
+  /// search text as the body, and no loading indicator. If the request is
+  /// successful, it sets [lstCity] with the response body and assigns
+  /// [lstCitySearch] with [lstCity]. If the request fails, it shows an
+  /// easy loading indicator.
   void getCities() {
     RequestManager.postRequest(
       uri: EndPoints.getCities,
@@ -289,6 +323,14 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Adds selected cities to the trip.
+  ///
+  /// This method is used to add cities to trip. It shows easy loading,
+  /// posts a request to [EndPoints.addCitiesToTrip] with selected cities
+  /// and trip id as body, and no loading indicator. If the request is
+  /// successful, it clears [lstEmptyCity], sets all cities in [lstCitySearch]
+  /// to not selected, and calls [getTripCityPollList] with [isShowLoader] set
+  /// to true. If the request fails, it does nothing.
   void addCityToTrip() {
     RequestManager.showEasyLoader();
     var tripCities = lstEmptyCity.map((e) {
@@ -317,6 +359,17 @@ class TripDetailController extends GetxController {
       onFailure: (error) {},
     );
   }
+
+  /// Adds a new date range to the trip.
+  ///
+  /// This method adds the selected date range to the list of dates (`lstEmptyDate`) for the trip.
+  /// It constructs a list of date objects (`tripDateMap`) by converting the start and end dates
+  /// from UTC to local time and formatting them as strings. Then, it sends a request to add these
+  /// dates to the trip using the `RequestManager.postRequest` method.
+  ///
+  /// Upon successful addition, it resets the date range, arrival and departure times, clears the
+  /// comment text field, and refreshes the trip date poll list. If the operation fails, it clears
+  /// the list of empty dates.
 
   void onDateAdded() {
     lstEmptyDate.add(MultiDateSelectionModel(
@@ -367,10 +420,19 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Converts a given date to a string in the format "ddth MMMM" (e.g. "24th December").
+  ///
+  /// This method uses the `ordinalSuffixOf` and `getMonthNameFromDateTime` methods of the
+  /// `Date` class to generate the string representation of the date.
   String getDateString(DateTime date) {
     return "${Date.shared().ordinalSuffixOf(int.parse(Date.shared().getOnlyDateFromDateTime(date)))} ${Date.shared().getMonthNameFromDateTime(date)}";
   }
 
+  /// Returns a string representation of the number of days between two dates.
+  ///
+  /// The method takes two [DateTime] objects and returns a string in the format
+  /// "X days" or "X day" depending on whether the number of days is greater than
+  /// one. The string is translated according to the current locale.
   String getDays(DateTime startDate, DateTime endDate) {
     int days = Date.shared().datesDifferenceInDay(startDate, endDate);
     return days > 1
@@ -378,10 +440,28 @@ class TripDetailController extends GetxController {
         : '$days ${LabelKeys.day.tr}';
   }
 
+  /// Returns the year component of the given [startDate] as a string.
+  ///
+  /// This method extracts the year from a [DateTime] object using the
+  /// `getOnlyYearFromDateTime` method of the `Date` class and returns it
+  /// as a string.
+  ///
+  /// [startDate]: The date from which to extract the year.
+  /// 
+  /// Returns a string representation of the year.
+
   String getYear(DateTime startDate) {
     return Date.shared().getOnlyYearFromDateTime(startDate);
   }
 
+  /// Gets the list of trip date polls from the server.
+  ///
+  /// This method takes a boolean parameter [isShowLoader] which determines whether to show a
+  /// loading dialog or not. If [isShowLoader] is true, it shows the loading dialog and sends a
+  /// request to the server to get the trip date polls. If the request is successful, it
+  /// converts the start and end dates of each poll to local time and assigns the response to
+  /// [lstTripDatePoll]. It also sets [restorationId] with a random string. If the request
+  /// fails, it shows an error message.
   void getTripDatePollList(bool isShowLoader) {
     if (isShowLoader) {
       RequestManager.showEasyLoader();
@@ -424,10 +504,21 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Checks whether [date1] is before [date2].
+  ///
+  /// This method is used to compare two dates and returns true if [date1] is
+  /// before [date2], otherwise it returns false.
   bool isDate1BeforeDate2(DateTime date1, DateTime date2) {
     return date1.isBefore(date2);
   }
 
+  /// Checks whether the response deadline date is valid or not.
+  ///
+  /// This method takes into account the following conditions to validate the response deadline date:
+  /// 1. The date should not be before the current date.
+  /// 2. The date should not be the same as the old response deadline date.
+  /// 3. The date should not be before any of the dates in the trip date poll.
+  /// If any of these conditions are not met, the method returns false. Otherwise, it returns true.
   bool checkResponseDeadLine() {
     printMessage(
         "Check response deadline date size ${lstTripDatePoll.length} date ${onDate.value}");
@@ -454,6 +545,11 @@ class TripDetailController extends GetxController {
     return true;
   }
 
+  /// Compares two lists and returns true if they contain the same elements, false otherwise.
+  ///
+  /// The lists are compared by converting them to sets and then checking if the two sets
+  /// have the same length and if the first set contains all the elements of the second set.
+  ///
   bool compareArrays(List<dynamic> array1, List<dynamic> array2) {
     Set<dynamic> set1 = Set.from(array1);
     Set<dynamic> set2 = Set.from(array2);
@@ -461,6 +557,16 @@ class TripDetailController extends GetxController {
     printMessage(array2);
     return set1.length == set2.length && set1.containsAll(set2);
   }
+
+  /// Updates the user's invitation status.
+  ///
+  /// This method handles updating the invitation status of a user. If the
+  /// status is approved, it checks user's selections for trip dates and 
+  /// cities. If either the date or city selection is empty, it shows an 
+  /// appropriate message and scrolls to the relevant section. Otherwise, 
+  /// it proceeds to call the API to update the user status with the given 
+  /// invitation status. If the status is not approved, it directly calls 
+  /// the API to update the user status.
 
   void updateUserStatus(String invitationStatus) {
     printMessage(invitationStatus);
@@ -494,6 +600,16 @@ class TripDetailController extends GetxController {
       updateUserStatusApiCall(invitationStatus);
     }
   }
+
+  /// Updates user status via API.
+  ///
+  /// This method sends a POST request to the [EndPoints.actionOnInvitation]
+  /// endpoint with the specified [invitationStatus] to update the user's
+  /// invitation status for a trip. If the [invitationStatus] is approved,
+  /// it checks current date selections and adds them if they differ from
+  /// previously selected dates, otherwise it compares city poll selections.
+  /// If the status is not approved, it simply navigates back.
+  /// Displays appropriate success or failure messages based on the response.
 
   void updateUserStatusApiCall(String invitationStatus) {
     RequestManager.postRequest(
@@ -530,6 +646,10 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Compares current city poll selections with previously stored selections.
+  ///
+  /// If the selections have changed, it calls [addCityPoll] to add the new
+  /// selections to the database. Otherwise, it navigates back.
   void compareCityPoll() {
     //for cities
     List<int> currentSelectionCity = [];
@@ -545,6 +665,13 @@ class TripDetailController extends GetxController {
     }
   }
 
+  /// Adds the given list of date poll IDs to the database for the current trip.
+  ///
+  /// This method sends a POST request to the [EndPoints.addDatePoll] endpoint
+  /// with the given list of date poll IDs and the current trip ID.
+  /// If the request is successful, it calls [compareCityPoll] to compare current
+  /// city poll selections with previously stored selections. If the request fails,
+  /// it also calls [compareCityPoll].
   void addDatePoll(List<int> tripDatesList) {
     RequestManager.postRequest(
       uri: EndPoints.addDatePoll,
@@ -568,6 +695,16 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Gets city poll details from API.
+  ///
+  /// This method is used to get city poll details associated with the current trip.
+  /// It takes a boolean parameter [isShowLoader] which determines whether to show
+  /// a loading dialog or not. If [isShowLoader] is true, it shows the loading dialog
+  /// and sends a request to the server to get the city poll details. If the request
+  /// is successful, it converts the start and end dates of each poll to local time
+  /// and assigns the response to [lstTripDetailsCityPoll]. It also sets
+  /// [restorationIdCity] with a random string. If the request fails, it shows an
+  /// error message.
   void getTripCityPollList(bool isShowLoader) {
     if (isShowLoader) {
       RequestManager.showEasyLoader();
@@ -607,6 +744,13 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Gets single trip plan from API.
+  ///
+  /// This method sends a POST request to the [EndPoints.getPlans] endpoint.
+  /// It shows an easy loader while the request is in progress.
+  /// If the request is successful, it updates the [lstSinglePlan] with the response
+  /// data and dismisses the easy loader.
+  /// If the request fails, it dismisses the easy loader.
   void getSingleTripPlan() {
     RequestManager.postRequest(
       uri: EndPoints.getPlans,
@@ -624,6 +768,13 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Adds the given list of city poll IDs to the database for the current trip.
+  ///
+  /// This method sends a POST request to the [EndPoints.addCityPoll] endpoint
+  /// with the given list of city poll IDs, the current trip ID, and selected
+  /// status as true.
+  /// If the request is successful, it calls [getTripCityPollList] with [isShowLoader]
+  /// set to true and navigates back. If the request fails, it navigates back.
   void addCityPoll(List<int> tripCityList) {
     RequestManager.postRequest(
       uri: EndPoints.addCityPoll,
@@ -645,6 +796,13 @@ class TripDetailController extends GetxController {
       },
     );
   }
+
+/// Updates the time for the selected date by host.
+///
+/// This method updates either the start date or end date of the selected
+/// date by host with a new time specified by [timeString]. If [isStartDate]
+/// is true, the start date's time is updated; otherwise, the end date's
+/// time is updated. It prints the updated start and end dates.
 
   void updateTimeForFinalizingDate(bool isStartDate, TimeOfDay timeString) {
     if (isStartDate) {
@@ -668,6 +826,14 @@ class TripDetailController extends GetxController {
     printMessage("End Date: ${selectedDateByHost!.endDate}");
   }
 
+  /// Saves the trip details to the database.
+  ///
+  /// This method sends a POST request to the [EndPoints.saveFinalTrip] endpoint
+  /// with the current trip ID, whether the trip is finalised, the trip name,
+  /// description, itinerary, response deadline, reminder days, and trip image URL.
+  /// If the request is successful, it updates the trip details in Firebase and
+  /// calls [getTripDetails] with [isShowLoader] set to false. If the request fails,
+  /// it does nothing.
   void saveFinalTrip() {
     /*final startDate = selectedDateByHost != null
         ? Date.shared().convertFormatToFormat(selectedDateByHost!.startDate!,
@@ -711,6 +877,22 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Finalizes a trip.
+  ///
+  /// This method is called when the user presses the "Finalize Trip" button.
+  /// It takes the current trip details, including the trip name, description,
+  /// itinerary, response deadline, and trip image and sends them to the server
+  /// to finalize the trip. It also takes the trip final start date, end date,
+  /// and city id and sends them to the server.
+  ///
+  /// The method also hides the keyboard and shows an easy loader.
+  ///
+  /// If the request is successful, it calls the [getGroupData] method to
+  /// update the UI and then dismisses the easy loader and pops the current
+  /// screen.
+  ///
+  /// If the request fails, it prints an error message and dismisses the easy
+  /// loader.
   void finalizeTrip() {
     Get.focusScope?.unfocus();
     hideKeyboard();
@@ -761,6 +943,14 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Deletes a trip.
+  ///
+  /// This method is called when the user presses the "Delete Trip" button.
+  /// It sends a POST request to the [EndPoints.deleteTrip] endpoint
+  /// with the current trip ID.
+  /// If the request is successful, it deletes the trip document from Firebase
+  /// and dismisses the easy loader.
+  /// If the request fails, it dismisses the easy loader.
   void deleteTrip() {
     RequestManager.showEasyLoader();
     RequestManager.postRequest(
@@ -787,6 +977,12 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Opens a subscription bottom sheet with a single trip plan.
+  ///
+  /// If the user is a host, it navigates to the subscription plan screen.
+  /// If the user is a guest, it shows a bottom sheet with the single trip plan
+  /// details. If there are no single trip plans available, it shows a snackbar
+  /// with a message saying "No plans found".
   void openSubscriptionBottomSheet(
       {required SingleTripPlanModel singleTripPlanModel}) {
     if (tripDetailsModel?.role == 'Host') {
@@ -838,6 +1034,17 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Sets callbacks for PayPal payment service.
+  ///
+  /// This method sets callbacks for the PayPal payment service. The callbacks
+  /// are called when the user cancels the payment, when the payment is successful,
+  /// or when there is an error with the payment. The callbacks are also called
+  /// when the shipping address is changed.
+  ///
+  /// The callbacks are set using the [FPayPalOrderCallback] class, which provides
+  /// a set of methods that can be overridden to handle the different callback
+  /// events. The callbacks are called with a [FPayPalApprovalData] object as an
+  /// argument, which contains the result of the payment.
   void payPalCallBackMethods() {
     //call backs for payment
     PayPalPayment.flutterPaypalNativePlugin.setPayPalOrderCallback(
@@ -864,6 +1071,14 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Makes a request to the server to purchase a plan.
+  ///
+  /// This method takes the payment data from PayPal and makes a POST request to the
+  /// [EndPoints.purchasePlan] endpoint to purchase a plan. If the request is successful,
+  /// it navigates back to the trip list screen and refreshes the trip details.
+  /// If the request fails, it does nothing.
+  ///
+  /// The [data] parameter is the payment data from PayPal.
   void purchasePlanAPI(FPayPalApprovalData data) {
     RequestManager.postRequest(
       uri: EndPoints.purchasePlan,
@@ -886,8 +1101,20 @@ class TripDetailController extends GetxController {
     );
   }
 
-  // To create calendar
-  createCalendar() async {
+  
+  /// Creates a new calendar on the device if it does not exist.
+  ///
+  /// This method requests permission to access the device's calendars and
+  /// then checks if a calendar named "Its Go Time Event" exists. If it does
+  /// not exist, it creates a new calendar with that name. The calendar color
+  /// is set to the primary color of the app and the local account name is set
+  /// to the first name of the user.
+  ///
+  /// If the calendar exists, it retrieves the ID of the calendar.
+  /// After creating the calendar or retrieving the ID, it calls the
+  /// [getCurrentLocation] method to get the current location of the user.
+  ///
+  void createCalendar() async {
     var permissionsGranted = await deviceCalendarPlugin.hasPermissions();
     if (permissionsGranted.isSuccess &&
         (permissionsGranted.data == null || permissionsGranted.data == false)) {
@@ -930,6 +1157,13 @@ class TripDetailController extends GetxController {
   String timeZoneName = 'Etc/UTC';
   late Location? currentLocation;
 
+  /// Gets the current location of the user.
+  ///
+  /// It first tries to get the local timezone using [FlutterNativeTimezone].
+  /// If it fails, it shows a toast with the message "Unable to add trip".
+  /// Then it gets the [Location] object from the [timeZoneDatabase] map using
+  /// the local timezone name as the key.
+  /// Finally it calls the [createEvent] method to create the event.
   void getCurrentLocation() async {
     try {
       timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
@@ -958,7 +1192,17 @@ class TripDetailController extends GetxController {
   }
 
   // To add event to calender
-  createEvent() async {
+  /// Adds a trip to the user's device calendar.
+  ///
+  /// If the platform is Android, it first tries to retrieve the events from the
+  /// calendar with the given [calenderId] and [RetrieveEventsParams] that
+  /// matches the trip's start and end dates. If the event does not exist, it
+  /// creates the event in the calendar. If the event exists, it shows a toast
+  /// with the message "Trip already exists".
+  ///
+  /// If the platform is iOS, it does the same as in Android, but it uses the
+  /// [TZDateTime] objects as the start and end dates of the [RetrieveEventsParams].
+  void createEvent() async {
     if (Platform.isAndroid) {
       Event event = Event(calenderId,
           title: tripDetailsModel?.tripName,
@@ -1021,20 +1265,46 @@ class TripDetailController extends GetxController {
   }
 
   // To delete calendar
-  deleteCalendar(String? calenderId) async {
+  /// Delete a calendar with the given [calenderId].
+  ///
+  /// This is a destructive operation and cannot be undone.
+  ///
+  /// If the calendar does not exist, this is a no-op.
+  ///
+  /// Returns a boolean indicating whether the calendar was deleted.
+  ///
+  /// Throws a [PlatformException] if something goes wrong.
+  void deleteCalendar(String? calenderId) async {
     var result = await deviceCalendarPlugin.deleteCalendar(calenderId!);
     printMessage("DELETE CALENDAR ${result.data}");
   }
 
   // To add plan details static data
+  /// To add plan details static data
+  ///
+  /// This method is used to add premium features list.
   void addPlanDetailsData() {
     lstSingleTripPlanModel = Constants.getSingleTripPlanList();
   }
 
   //To add reminder list static data
+  /// To add reminder list static data
+  ///
+  /// This method is used to add the list of reminders which are shown in the
+  /// reminder list of the trip creation screen. The list is fetched from the
+  /// [Constants.getReminderDaysList()] method.
   void addReminderListData() {
     lstReminder = Constants.getReminderDaysList();
   }
+
+  /// Updates PayPal and Venmo usernames via an API call.
+  ///
+  /// This method sends a POST request to the [EndPoints.updateUsernames] endpoint
+  /// with the PayPal and Venmo usernames from their respective controllers.
+  /// If the request is successful, it updates the user data in the preferences,
+  /// clears the username input fields, and navigates to the
+  /// [Routes.EXPANSE_RESOLUTION_TABS] screen, passing the trip details model id
+  /// as an argument. In the case of an error, it logs the error message.
 
   void updatePaypalVenmoUsernameApi() {
     RequestManager.postRequest(
@@ -1062,6 +1332,15 @@ class TripDetailController extends GetxController {
         });
   }
 
+  /// Increments or decrements the number of reminder days based on the value of
+  /// the [add] parameter.
+  ///
+  /// If [add] is true, the [noOfReminderDays] is incremented by 1 if it is less
+  /// than the [maxReminderDays] value. Otherwise, a toast message showing the
+  /// [LabelKeys.maximumLimitReached] string is displayed.
+  ///
+  /// If [add] is false, the [noOfReminderDays] is decremented by 1 if it is
+  /// greater than 0.
   void reminderDateStepper(bool add) {
     if (add) {
       if (noOfReminderDays < maxReminderDays.value) {
@@ -1075,6 +1354,16 @@ class TripDetailController extends GetxController {
       }
     }
   }
+
+  /// Handles the finalize button click event.
+  ///
+  /// This method validates the form and checks several conditions to determine
+  /// if the trip can be finalized. If the form is valid, it checks if the date,
+  /// image URL, final date, and city are selected. If any of these are missing,
+  /// it displays a toast message with the appropriate error message and scrolls
+  /// to the relevant section of the form. If all conditions are satisfied, it
+  /// displays a success bottom sheet. If the form is not valid, it checks for
+  /// specific comment errors and scrolls to the comment section if necessary.
 
   void finalizeButtonClick() {
     //Get.focusScope?.unfocus();
@@ -1114,12 +1403,24 @@ class TripDetailController extends GetxController {
   }
 
   // Function to scroll to the container's position
+  /// Ensures that the widget identified by [globalKey] is visible by scrolling to
+  /// it if necessary.
+  ///
+  /// The scrolling is animated and takes one second. The widget is scrolled to
+  /// the middle of the screen.
   void scrollToContainer(GlobalKey globalKey) {
     Scrollable.ensureVisible(globalKey.currentContext!,
         duration: const Duration(seconds: 1), // duration for scrolling time
         alignment: .5, // 0 mean, scroll to the top, 0.5 mean, half
         curve: Curves.easeInOutCubic);
   }
+
+/// Displays a bottom sheet with trip details and a confirmation button.
+///
+/// This widget presents a column layout containing an icon, various trip details
+/// such as start date, end date, and city name, and a note related to the trip.
+/// The bottom of the sheet includes an "OK" button which, when pressed, finalizes
+/// the trip and closes the bottom sheet.
 
   Widget successBottomSheet() {
     return Column(
@@ -1175,6 +1476,13 @@ class TripDetailController extends GetxController {
     );
   }
 
+  /// Save trip button click event handler.
+  ///
+  /// This function is invoked when the user clicks the "Save" button on the trip
+  /// detail screen. It validates the form, checks for a valid response deadline,
+  /// and ensures a trip display image is selected. If all these checks pass,
+  /// then the trip is saved. Otherwise, a toast message is displayed with an
+  /// appropriate error message.
   void saveButtonClicked() {
     isTripToFinalised.value = 0;
     if (formKey.currentState!.validate()) {
@@ -1196,6 +1504,19 @@ class TripDetailController extends GetxController {
     }
   }
 
+  /// Updates the group name and image in the Firestore database.
+  ///
+  /// This method first fetches the document from Firestore and checks if it
+  /// exists. If it does, it creates a new map with the updated group name and
+  /// image, and then updates the document with the new data. If the document
+  /// does not exist, it prints a message indicating that the document does not
+  /// exist.
+  ///
+  /// Parameters:
+  /// - [name]: The new group name.
+  /// - [imageUrl]: The new group image URL.
+  /// - [onThen]: A callback function that is called after the document has
+  ///   been updated.
   void getGroupData(String name, String imageUrl, Function onThen) {
     FirebaseFirestore.instance
         .collection(FireStoreCollection.tripGroupCollection)

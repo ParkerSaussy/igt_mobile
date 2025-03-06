@@ -35,6 +35,12 @@ class ExpansePayController extends GetxController {
     super.onClose();
   }
 
+  /// Returns a Venmo payment link.
+  ///
+  /// If [userName] is null, returns the base URL for Venmo payment links.
+  /// Otherwise, returns a payment link with the user name, transaction type
+  /// set to "pay" and the amount set to [amount].
+  ///
   String getVenmoPaymentLink(String? userName, String amount) {
     String url = "";
     url = "https://account.venmo.com/";
@@ -45,6 +51,11 @@ class ExpansePayController extends GetxController {
     return url;
   }
 
+  /// Returns a PayPal payment link.
+  ///
+  /// If [userName] is null, returns the base URL for PayPal payment links.
+  /// Otherwise, returns a payment link with the user name.
+  ///
   String getPaypalLink(String? userName) {
     String url = "";
     url = "https://paypal.me/";
@@ -53,6 +64,14 @@ class ExpansePayController extends GetxController {
     }
     return url;
   }
+
+  /// Initiates a payment to a user for a specific trip expense.
+  ///
+  /// This method sends a POST request to the [EndPoints.payExpense] endpoint
+  /// with the trip ID, creditor ID, amount to be paid, and the ID of the user
+  /// making the payment. Upon a successful request, it displays a success toast
+  /// message and navigates back. If the request fails, it logs the error and
+  /// navigates back.
 
   void payToUser() {
     RequestManager.postRequest(

@@ -128,6 +128,21 @@ class EditProfileController extends GetxController {
         : gc.loginData.value.profileImage.toString();
   }
 
+  /// Picks an image from the specified source, uploads it, and updates the profile image URL.
+  ///
+  /// This function uses `CustomImagePicker` to allow the user to select an image
+  /// from the given [source]. The image is then cropped to a 1:1 aspect ratio.
+  /// Once an image is selected, it is uploaded using `RequestManager`. On successful
+  /// upload, the `tempProfileImage` is updated with the new image URL.
+  /// 
+  /// The function ensures UI updates after setting the new image URL.
+  ///
+  /// [source] specifies the source from which the image is to be picked (e.g., camera or gallery).
+  /// [context] is the build context in which the function is executed.
+  /// 
+  /// Handles possible errors during image upload and connection failures by
+  /// logging the error or message.
+
   void getImage(ImageSource source, BuildContext context) async {
     FGBGEvents.ignoreWhile(() async {
       final file = await CustomImagePicker.pickImage(
@@ -164,6 +179,15 @@ class EditProfileController extends GetxController {
 
   }
 
+  /// 
+  /// Edits the user's profile by sending a POST request to the server.
+  ///
+  /// This method takes the user's profile image, first name, last name, PayPal
+  /// username, and Venmo username and sends a POST request to the
+  /// [EndPoints.editProfile] endpoint. If the server responds with a success
+  /// status, it updates the user's profile data in the local storage and
+  /// navigates back to the previous screen. It also displays a toast message
+  /// with the response message.
   void editProfile() {
     var profileImage = '';
     if (tempProfileImage.value.isNotEmpty) {
@@ -213,6 +237,15 @@ class EditProfileController extends GetxController {
     mobileController.clear();
   }
 
+  /// Sends an OTP to the user's registered mobile number.
+  ///
+  /// This function creates a body with the receiver type as mobile, the receiver
+  /// as the concatenation of the country code and the mobile number, and the
+  /// OTP type as update mobile. It then sends a POST request to the
+  /// [EndPoints.sendOtp] endpoint. If the server responds with a success status,
+  /// it displays a bottom sheet with the OTP verification UI and starts a timer
+  /// for 60 seconds. If the server responds with a failure status, it displays
+  /// an error message.
   void sendOtp() {
     var body = {
       RequestParams.reciverType: RequestParams.mobile,
@@ -241,6 +274,13 @@ class EditProfileController extends GetxController {
     );
   }
 
+  /// Verifies an OTP sent to the user's registered mobile number.
+  ///
+  /// This function takes the OTP entered by the user, sends a POST request to
+  /// the [EndPoints.verifyOtp] endpoint with the OTP, and checks if the OTP is
+  /// valid. If the OTP is valid, it updates the mobile number in the user's
+  /// profile and navigates back to the previous screen. If the OTP is invalid,
+  /// it displays an error message.
   void verifyOtpAPI() {
     var body = {
       RequestParams.reciverType: RequestParams.mobile,
@@ -270,6 +310,10 @@ class EditProfileController extends GetxController {
     );
   }
 
+  /// Starts a timer that counts down from 25 seconds. After each second the
+  /// `timeStart` observable is updated with the remaining time in the format
+  /// "mm:ss". When the timer reaches 0, the `isResendVisible` observable is set
+  /// to true and the timer is cancelled.
   void startTimer() {
     timeCounter = Constants.timeCounter;
     timeStart.value = "00:25";
@@ -292,7 +336,13 @@ class EditProfileController extends GetxController {
     );
   }
 
-  formatHHMMSS() {
+/// Formats the timeCounter into a "mm:ss" string and updates timeStart.
+/// If timeCounter is positive, it calculates the minutes and seconds,
+/// formats them with leading zeros, and assigns the result to timeStart.
+/// If timeCounter is zero or negative, it sets timeStart to an empty string
+/// and resets timeCounter to zero.
+
+  void formatHHMMSS() {
     if (timeCounter! > 0) {
       printMessage("timeCounter   $timeCounter");
       int minutes = (timeCounter! / 60).truncate();
@@ -305,6 +355,17 @@ class EditProfileController extends GetxController {
       timeCounter = 0;
     }
   }
+
+  /// Updates the user's mobile number by sending a POST request to the server.
+  ///
+  /// This function constructs a request body with the user's current country code
+  /// and mobile number, then sends a POST request to the [EndPoints.updateMobileNumber]
+  /// endpoint. If the request is successful and the server responds positively, it
+  /// updates the user data in local storage with the response data and clears the
+  /// OTP input field. It also updates the login data observable and generates a new
+  /// restoration ID for the mobile field. If the request fails, it logs the error
+  /// message and sets the mobile number in the login data observable to the current
+  /// input.
 
   void updateMobileNumber() {
     var body = {
@@ -334,6 +395,19 @@ class EditProfileController extends GetxController {
     );
   }
 
+  /// Returns a bottom sheet widget with a PIN input field and a verification button.
+  ///
+  /// The PIN input field is a Pinput widget with a length of 4, a custom
+  /// formatter to only allow digits, and a custom validator to check if the PIN
+  /// is empty or not equal to 4. The focused pin theme is set to the submitted pin
+  /// theme and the error pin theme is set to the error pin theme. The PIN input
+  /// field is also focused when the bottom sheet is opened.
+  ///
+  /// The verification button is a gradient button with a text "Verify". When the
+  /// button is pressed, the function `verifyOtpAPI` is called.
+  ///
+  /// The bottom sheet also has a resend OTP button. When the button is pressed,
+  /// the `sendOtp` function is called and the bottom sheet is closed.
   Widget verifyOtpBottomSheet() {
     return Obx(
       () => BottomSheetWithClose(

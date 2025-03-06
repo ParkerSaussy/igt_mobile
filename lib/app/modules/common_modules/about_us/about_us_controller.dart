@@ -36,6 +36,11 @@ class AboutUsController extends GetxController {
   */
   }
 
+  /// This function is used to get the content of the selected type (about us,
+  /// terms and conditions, privacy policy) from the server. It sends a POST
+  /// request to the server with the type of content to be retrieved. The
+  /// response is then parsed and the content is stored in the 'termscond'
+  /// variable.
   void getCMS() async {
     var body = {
       RequestParams.type: requestType.value == LabelKeys.termsAndCondition.tr

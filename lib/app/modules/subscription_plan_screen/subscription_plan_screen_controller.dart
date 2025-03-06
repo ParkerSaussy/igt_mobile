@@ -28,6 +28,14 @@ class SubscriptionPlanScreenController extends GetxController {
     getSingleTripPlan();
   }
 
+  /// Gets single trip plan from API.
+  ///
+  /// This method sends a POST request to the [EndPoints.getPlans] endpoint.
+  /// It shows an easy loader while the request is in progress.
+  /// If the request is successful, it updates the [lstSinglePlan] with the response
+  /// data, sets the first single trip plan as selected, and opens the subscription
+  /// bottom sheet.
+  /// If the request fails, it dismisses the easy loader.
   void getSingleTripPlan() {
     RequestManager.postRequest(
       uri: EndPoints.getPlans,
@@ -55,6 +63,16 @@ class SubscriptionPlanScreenController extends GetxController {
     );
   }
 
+  /// Calculates the plan duration in years and months.
+  ///
+  /// This method takes the index of a plan from [lstSinglePlan] and calculates its
+  /// duration in terms of years and months. If the duration is 12 months or more,
+  /// it converts the duration into years and months. If the duration is less than
+  /// 12 months, it returns the duration in months. The result is formatted as a
+  /// string with translated year and month labels.
+  ///
+  /// Returns a formatted string representing the plan's duration.
+
   String yearCalculate(int index) {
     String totalYear = "";
     if (lstSinglePlan[index].duration >= 12) {
@@ -73,6 +91,15 @@ class SubscriptionPlanScreenController extends GetxController {
     return totalYear;
   }
 
+  /// Calculates the duration of an activated plan in years and months.
+  ///
+  /// This method takes a duration in months and calculates its duration in terms
+  /// of years and months. If the duration is 12 months or more, it converts the
+  /// duration into years and months. If the duration is less than 12 months, it
+  /// returns the duration in months. The result is formatted as a string with
+  /// translated year and month labels.
+  ///
+  /// Returns a formatted string representing the plan's duration.
   String activatedYearCalculate(int duration) {
     String totalYear = "";
     if (duration >= 12) {
@@ -90,6 +117,14 @@ class SubscriptionPlanScreenController extends GetxController {
     return totalYear;
   }
 
+  /// Calculates the percentage discount for a given plan.
+  ///
+  /// This method takes the index of a plan from [lstSinglePlan] and calculates its
+  /// discount percentage. The discount percentage is calculated by subtracting
+  /// the discounted price from the actual price and then dividing the result by
+  /// the actual price, multiplied by 100.
+  ///
+  /// Returns the discount percentage as a double.
   double percentageCalculate(int index) {
     double percentageValue = 0.0;
     final discountedPrice = lstSinglePlan[index].discountedPrice;
@@ -101,6 +136,17 @@ class SubscriptionPlanScreenController extends GetxController {
     return percentageValue;
   }
 
+  /// Makes a request to the server to purchase a plan.
+  ///
+  /// This method takes the payment data from either PayPal or Apple Pay and
+  /// makes a POST request to the [EndPoints.purchasePlan] endpoint to purchase a
+  /// plan. If the request is successful, it updates the user data and navigates
+  /// back to the previous screen.
+  ///
+  /// The [data] parameter is the payment data from either PayPal or Apple Pay.
+  /// The [fromApple] parameter is a boolean indicating whether the payment data
+  /// comes from Apple Pay or PayPal. The [transactionIdentifier] parameter is the
+  /// transaction identifier for the payment if it comes from Apple Pay.
   void purchasePlanAPI(data, bool fromApple, String transactionIdentifier) {
     RequestManager.postRequest(
       uri: EndPoints.purchasePlan,
@@ -128,6 +174,15 @@ class SubscriptionPlanScreenController extends GetxController {
     );
   }
 
+  /// Handles the result of an Apple Pay payment.
+  ///
+  /// This method is called when the Apple Pay payment sheet is completed.
+  /// It prints the payment result and transaction identifier to the console,
+  /// and then calls [purchasePlanAPI] to send the payment result to the server.
+  ///
+  /// The [paymentResult] parameter is a map containing the result of the Apple
+  /// Pay payment sheet. The map must contain the "transactionIdentifier" key.
+  ///
   void onApplePayResult(paymentResult) {
     printMessage("paymentResult: $paymentResult");
     printMessage(
@@ -136,6 +191,12 @@ class SubscriptionPlanScreenController extends GetxController {
     // Send the resulting Apple Pay token to your server / PSP
   }
 
+  /// Makes a payment using PayPal.
+  ///
+  /// This method is called when the user taps on the "Unlock Trip" button.
+  /// It shows an easy loader and makes a payment request using the PayPal
+  /// payment service. When the payment is successful, it calls
+  /// [purchasePlanAPI] to send the payment result to the server.
   void makePayment() {
     RequestManager.showEasyLoader();
     payPalCallBackMethods();
@@ -144,6 +205,17 @@ class SubscriptionPlanScreenController extends GetxController {
     );
   }
 
+  /// Sets callbacks for PayPal payment service.
+  ///
+  /// This method sets callbacks for the PayPal payment service. The callbacks
+  /// are called when the user cancels the payment, when the payment is successful,
+  /// or when there is an error with the payment. The callbacks are also called
+  /// when the shipping address is changed.
+  ///
+  /// The callbacks are set using the [FPayPalOrderCallback] class, which provides
+  /// a set of methods that can be overridden to handle the different callback
+  /// events. The callbacks are called with a [FPayPalApprovalData] object as an
+  /// argument, which contains the result of the payment.
   void payPalCallBackMethods() {
     //call backs for payment
     PayPalPayment.flutterPaypalNativePlugin.setPayPalOrderCallback(

@@ -49,6 +49,15 @@ class SignupController extends GetxController {
 
 // EMAIL VALIDATION
   RxString emailValidationMsg = "".obs;
+  /// Validate the email address.
+  ///
+  /// This function takes in the email address from the UI and checks if it is
+  /// valid. If the email address is empty, the function sets the error message to
+  /// "Please enter email address". If the email address is not empty, the function
+  /// checks if the email address is valid. If the email address is invalid, the
+  /// function sets the error message to "Please enter valid email address". If
+  /// the email address is valid, the function sets the error message to an empty
+  /// string.
   void validateEmail(String value) {
     if (value.isEmpty) {
       emailValidationMsg.value = LabelKeys.blankEmail.tr;
@@ -94,6 +103,15 @@ class SignupController extends GetxController {
     super.onClose();
   }
 
+  /// Send a signup request to the server.
+  ///
+  /// This function takes in the user details from the UI and sends a signup
+  /// request to the server. The request body contains the first name, last name,
+  /// email address, country code, mobile number, password, firebase token, device
+  /// id, and platform type. If the request is successful, the function navigates
+  /// to the OTP screen with the email address, OTP type set to verify, and
+  /// isFromSignUp set to true. If the request fails, the function shows an error
+  /// message.
   void signup() async {
     final deviceId = await getDeviceId();
     var body = {
@@ -150,7 +168,9 @@ class SignupController extends GetxController {
 
   GoogleSignInClass googleSignInClass = GoogleSignInClass();
 
-  doGoogleLogin() async {
+  /// It will do google signin and then it will do login if internet is connected
+  /// otherwise it will show a toast message
+  void doGoogleLogin() async {
     if (!await isConnectedNetwork()) {
       RequestManager.getSnackToast(
         //title: LabelKeys.noInternet.tr,
@@ -178,7 +198,11 @@ class SignupController extends GetxController {
     }
   }
 
-  doAppleLogin() async {
+  /// Do Apple Sign in and then it will do login if internet is connected.
+  /// If email is not available in apple sign in then it will call
+  /// [getEmailForAppleLogin] to get the email from our server.
+  /// If internet is not connected then it will show a toast message
+  void doAppleLogin() async {
     if (!await isConnectedNetwork()) {
       RequestManager.getSnackToast(
         //title: LabelKeys.noInternet.tr,
@@ -211,6 +235,10 @@ class SignupController extends GetxController {
     }
   }
 
+  /// Call to server to get the email if it is not available during the Apple Sign in.
+  /// [socialId] is the id of the user which is received from the Apple Sign in.
+  /// If response is success then it will call [doLogin] method.
+  /// If response is failure then it will print the error message.
   void getEmailForAppleLogin(String socialId) {
     RequestManager.postRequest(
       uri: EndPoints.getEmailForApple,
@@ -235,6 +263,15 @@ class SignupController extends GetxController {
     Get.offAll(BiomatericAuth());
     //Get.offAllNamed(Routes.DASHBOARD);
   }
+  /// Do login.
+  ///
+  /// If the user is from social (google, apple) then it will directly go to dashboard.
+  /// If the user is from normal login then it will check if the email is verified or not.
+  /// If the email is not verified then it will show an alert to verify the email.
+  /// If the email is verified then it will check if the mobile number is verified or not.
+  /// If the mobile number is not verified then it will go to OTP screen to verify the mobile number.
+  /// If the mobile number is verified then it will go to dashboard.
+  /// If any error occurs then it will go to login screen.
   void doLogin() async {
     final deviceId = await getDeviceId();
     var body = {
@@ -299,6 +336,17 @@ class SignupController extends GetxController {
       },
     );
   }
+
+  /// Adds a new user to the Firestore user collection.
+  ///
+  /// This function takes a [UserData] object and adds the user's information to
+  /// the Firestore database with the user's ID as the document ID. If the user
+  /// is successfully added and is using Google or Apple for login, it sets the
+  /// login response and navigates to the dashboard. If the operation fails, it
+  /// navigates to the login screen and logs the error.
+  ///
+  /// [userModel] is the user data object containing details such as first name,
+  /// last name, profile image, mobile number, user ID, email, and FCM token.
 
   void createUserInFirebase(UserData userModel) {
     FireStoreServices.addDataWithDocumentId(

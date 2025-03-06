@@ -39,6 +39,10 @@ class AddNewPhotosController extends GetxController {
     getTripMemoryMemory(tripId.value);
   }
 
+  /// This function is used to get the trip memory activities from server.
+  /// [value] is the trip id for which activities are required.
+  /// The response is parsed and stored in the observable list [lstActivity].
+  /// If server returns error, it is printed in the console.
   void getTripMemoryMemory(int value) {
     RequestManager.postRequest(
         uri: EndPoints.getActivityName,
@@ -56,6 +60,13 @@ class AddNewPhotosController extends GetxController {
         });
   }
 
+  /// This function is used to add new memory to the server.
+  /// It takes the list of selected images, compresses and converts them to bytes,
+  /// and then uploads them one by one to the server.
+  /// If the upload is successful, it shows a success toast and navigates back.
+  /// If the upload fails, it shows an error toast and navigates back.
+  /// If there is no internet connection, it shows a connection failed toast and navigates back.
+  ///
   Future<void> addMemory() async {
     File selectedImage;
     int counter = 0;
@@ -116,6 +127,8 @@ class AddNewPhotosController extends GetxController {
     }
   }
 
+  /// Clear caption, location controllers and local image path list.
+  /// Reset selected activity value to empty string.
   void clear() {
     captionController.clear();
     locationController.clear();

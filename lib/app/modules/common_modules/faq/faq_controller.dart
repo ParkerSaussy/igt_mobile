@@ -29,6 +29,21 @@ class FaqController extends GetxController {
     }*/
   }
 
+  /// Fetches the list of FAQs from the server and updates [faqList] and
+  /// [faqSearchList] with the response. Also updates [restorationFaq] with a
+  /// new random string.
+  ///
+  /// [EndPoints.faqList] is the endpoint for this request.
+  /// [isSuccessMessage] is set to false, so no success message is shown.
+  /// [isLoader] is set to true, so the loader is shown.
+  /// [hasBearer] is set to true, so the bearer token is included in the
+  /// request headers.
+  ///
+  /// The response body is expected to contain a list of FAQ objects, which are
+  /// then mapped to [FaqListModel] objects and added to [faqList] and
+  /// [faqSearchList].
+  ///
+  /// If the request fails, [onFailure] is called with the error message.
   void getFAQ() {
     RequestManager.getRequest(
       isSuccessMessage: false,
